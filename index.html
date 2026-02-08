@@ -273,22 +273,24 @@ window.onfocus = function() {
                     adsWatched: (d.adsWatched || 0) + 1,
                     completedTasks: completedTasks
                 }).then(() => {
-    tg.showAlert("টাকা যোগ হয়েছে।");
 
-    // মেসেজ পরিবর্তন
-    const msgEl = document.getElementById(`msg-${activeTask.btnId}`);
-    if (msgEl) {
-        msgEl.innerText = "বক্সের কাজ আপনি আজ শেষ করেছেন। অন্য বক্সে ক্লিক করুন।";
-    }
+tg.showAlert("টাকা যোগ হয়েছে।");
 
-    // বাটনের কালার পরিবর্তন
-    const btnIndex = activeTask.btnId.split('-')[1];
-    const btn = document.getElementById(`ad-btn-${btnIndex}`);
-    if (btn) {
-        btn.style.background = "#444";
-    }
+// কল্পের নিচের লেখাটি সাথে সাথে পরিবর্তন করে দেওয়া হচ্ছে
 
-    activeTask = null;
+if(msgEl) msgEl.inner Text "বক্সের কাজ আপনি আজ শেষ করেছেন। অন্য বক্সে ক্লিক করুন।":
+
+const msgEl document.getElementById("msg-$(activeTask.btnId}');
+
+const btnIndex activeTask.btnId.split('-')[1];
+
+const btn = document.getElementById("ad-btn- btnIndex);
+
+if(btn) btn.style.background="#444";
+
+});
+
+activeTask= null;;
         });
         } else {
             tg.showAlert("১৫ সেকেন্ড পূর্ণ হয়নি! ❌");
