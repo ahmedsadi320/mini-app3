@@ -116,7 +116,7 @@
             <div style="font-size: 40px; margin-bottom: 10px;">▶️</div>
             <h3>𝐓𝐮𝐭𝐨𝐫𝐢𝐚𝐥 𝐕𝐢𝐝𝐞𝐨</h3>
 			<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
-   কিভাবে এখানে আয় করবেন,ভিডিও দেখা শিখে নিন।
+   কিভাবে এখানে আয় করবেন,ভিডিও দেখে শিখে নিন।
 			</p>
             <button onclick="window.open('https://youtube.com')" class="btn-blue" style="background: #2575fc;">Open Tutorial</button>
         </div>
@@ -273,10 +273,11 @@ window.onfocus = function() {
                     adsWatched: (d.adsWatched || 0) + 1,
                     completedTasks: completedTasks
                 }).then(() => {
-                    tg.showAlert("টাকা যোগ হয়েছে! ✅");
+                    tg.showAlert("Bonus claimed✅");
                     // বক্সের নিচের লেখাটি সাথে সাথে পরিবর্তন করে দেওয়া হচ্ছে
-                    const msgEl = document.getElementById(`msg-${activeTask.btnId}`);
-                    if(msgEl) msgEl.innerText = "বক্সের কাজ আপনি আজ শেষ করেছেন! অন্য বক্সে ক্লিক করুন।";
+                    // ২৬১ নম্বর লাইনের নিচে এটি বসান
+const msgEl = document.getElementById(`msg-${activeTask.btnId}`);
+if (msgEl) msgEl.innerText = "কাজের কাজ আপনি আজ শেষ করেছেন! অন্য বক্সে ক্লিক করুন!";
                     
                     const btnIndex = activeTask.btnId.split('-')[1];
                     const btn = document.getElementById('ad-btn-' + btnIndex);
@@ -314,12 +315,12 @@ window.onfocus = function() {
             el.value = link; document.body.appendChild(el);
             el.select(); document.execCommand('copy');
             document.body.removeChild(el);
-            tg.showAlert("লিঙ্ক কপি হয়েছে!");
+            tg.showAlert("Link copied");
         }
 
         function shareRef() {
             const link = document.getElementById('ref-url').innerText;
-            tg.openTelegramLink(`https://t.me/share/url?url=${link}&text=আয় করুন সহজে!`);
+            tg.openTelegramLink(`https://t.me/share/url?url=${link}&text=Earn easily!`);
         }
 
         function nav(id, el) {
