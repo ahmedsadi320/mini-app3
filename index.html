@@ -118,13 +118,13 @@
 			<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
    কিভাবে এখানে আয় করবেন,ভিডিও দেখে শিখে নিন।
 			</p>
-            <button onclick="window.open('https://youtube.com')" class="btn-blue" style="background: #2575fc;">Open Tutorial</button>
+            <button onclick="window.open('https://www.effectivegatecpm.com/ryk3u53hv9?key=e22b7e110ad6415a286ab7d67eaaab01')" class="btn-blue" style="background: #2575fc;">Open Tutorial</button>
         </div>
         <div class="supp-grid">
-            <div class="supp-card" onclick="window.open('https://t.me/YOUR_TG')"><i>✈️</i><span>Telegram</span></div>
-            <div class="supp-card" onclick="window.open('mailto:YOUR_MAIL')"><i>📧</i><span>Email</span></div>
-            <div class="supp-card" onclick="window.open('https://t.me/YOUR_TG')"><i>💬</i><span>Live Chat</span></div>
-            <div class="supp-card" onclick="tg.showAlert('Coming Soon')"><i>❓</i><span>FAQ</span></div>
+            <div class="supp-card" onclick="window.open('https://www.effectivegatecpm.com/bnf8sx6u?key=2f6d12f5ca045d5a285e61b1e83e8de1')"><i>✈️</i><span>Telegram</span></div>
+            <div class="supp-card" onclick="window.open('https://www.effectivegatecpm.com/dxd0u21e?key=ade662ce0e2415294a202b3b5afedbd4')"><i>📧</i><span>Email</span></div>
+            <div class="supp-card" onclick="window.open('https://www.effectivegatecpm.com/efqyyij5j?key=6e93fdba50b67b85f3dbcff7725c1bcb')"><i>💬</i><span>Live Chat</span></div>
+            <div class="supp-card" onclick="tg.showAlert('https://www.effectivegatecpm.com/ryk3u53hv9?key=e22b7e110ad6415a286ab7d67eaaab01')"><i>❓</i><span>FAQ</span></div>
         </div>
     </div>
 
@@ -193,10 +193,10 @@
 
         // আপনার অ্যাড লিঙ্কগুলো
 const adLinks = [
-    'https://t.me/fojikapp',
-    'https://t.me/fojikapp_bot',
-    'https://t.me/fojikapp',
-    'https://t.me/fojikapp_bot'
+    'https://www.effectivegatecpm.com/efqyyij5j?key=6e93fdba50b67b85f3dbcff7725c1bcb',
+    'https://www.effectivegatecpm.com/ryk3u53hv9?key=e22b7e110ad6415a286ab7d67eaaab01',
+    'https://www.effectivegatecpm.com/dxd0u21e?key=ade662ce0e2415294a202b3b5afedbd4',
+    'https://www.effectivegatecpm.com/bnf8sx6u?key=2f6d12f5ca045d5a285e61b1e83e8de1'
 ];
 
 const adList = document.getElementById('ad-list');
@@ -253,7 +253,7 @@ function handleTask(btnId, link, amount) {
             tg.showAlert("বিজ্ঞাপনে ১৫ সেকেন্ড থাকুন।");
         } else {
             activeTask = null; // কাজ শেষ থাকলে টাকা যোগ হবে না, শুধু এড দেখা যাবে
-            tg.showAlert("আপনি এই বক্সের বোনাস আজ নিয়েছেন। শুধু এড দেখা যাবে।");
+            tg.showAlert("Daily bonus claimed✅");
         }
     });
 }
@@ -273,10 +273,10 @@ window.onfocus = function() {
                     adsWatched: (d.adsWatched || 0) + 1,
                     completedTasks: completedTasks
                 }).then(() => {
-                    tg.showAlert("টাকা যোগ হয়েছে! ✅");
+                    tg.showAlert("bonus claimed✅");
                     // বক্সের নিচের লেখাটি সাথে সাথে পরিবর্তন করে দেওয়া হচ্ছে
                     const msgEl = document.getElementById(`msg-${activeTask.btnId}`);
-                    if(msgEl) msgEl.innerText = "বক্সের কাজ আপনি আজ শেষ করেছেন! অন্য বক্সে ক্লিক করুন।";
+                    if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     
                     const btnIndex = activeTask.btnId.split('-')[1];
                     const btn = document.getElementById('ad-btn-' + btnIndex);
@@ -301,7 +301,7 @@ window.onfocus = function() {
             else if(amt < 800) { tg.showAlert("Minimum Withdraw:800 Taka"); }
             else {
                 uRef.update({ balance: bal - amt }).then(() => {
-                    tg.showAlert("Withdraw Request Success✅");
+                    tg.showAlert("Withdraw Request Successful✅");
                     document.getElementById('w-amount').value = "";
                     document.getElementById('w-number').value = "";
                 });
