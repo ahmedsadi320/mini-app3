@@ -7,7 +7,8 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  	<style>
         /* হুবহু ডিজাইন CSS যা আপনি দিয়েছেন */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: #0d1117; color: white; padding-bottom: 90px; }
@@ -85,7 +86,7 @@
 <body>
 
     <div class="header">
-        <img class="u-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+        <img id="user-photo" class="u-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
         <div>
             <div id="u-name" class="u-name-text">Loading... <span style="color:#3b82f6">✔️</span></div>
             <div class="balance-badge">৳ <span id="u-balance">0.00</span> টাকা 💰</div>
@@ -114,6 +115,9 @@
         <div class="card" style="background: linear-gradient(145deg, #1c2128, #0d1117);">
             <div style="font-size: 40px; margin-bottom: 10px;">▶️</div>
             <h3>টিউটোরিয়াল ভিডিও</h3>
+  <p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
+    কিভাবে এখানে আয় করবেন,ভিডিও দেখে শিখে নিন।
+  </p>
             <button onclick="window.open('https://youtube.com')" class="btn-blue" style="background: #2575fc;">টিউটোরিয়াল দেখুন</button>
         </div>
         <div class="supp-grid">
@@ -130,6 +134,9 @@
         <div class="card">
             <div style="background:#007bff; width:50px; height:50px; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;">✈️</div>
             <h3>Join Telegram Channel</h3>
+			<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
+    চ্যানেলে জয়েন করার জন্য ৪০ টাকা আয় করুন।
+			</p>
             <button id="join-btn" onclick="handleTask('join-btn', 'https://t.me/YOUR_CHANNEL', 40)" class="btn-blue">Join & Claim</button>
         </div>
     </div>
@@ -167,13 +174,16 @@
         const uRef = db.ref('users/' + uId);
         let bal = 0;
 
-        uRef.on('value', (s) => {
-            const d = s.val() || {balance:0, referrals:0, adsWatched:0};
-            bal = d.balance || 0;
-            document.getElementById('u-balance').innerText = bal.toFixed(2);
-            document.getElementById('u-ref').innerText = d.referrals || 0;
-            document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
-            document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ` <span style="color:#3b82f6">✔️</span>`;
+        // ১. প্রোফাইল ছবি লোড করা
+    if (user && user.photo_url) {
+        document.getElementById('user-photo').src = user.photo_url;
+    }
+
+    // ২. ব্লু টিকসহ নাম এবং অন্যান্য তথ্য আপডেট করা
+    document.getElementById('u-balance').innerText = bal.toFixed(2);
+    document.getElementById('u-ref').innerText = d.referrals || 0;
+    document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
+    document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">`;
             document.getElementById('ref-url').innerText = `https://t.me/Red_Chilii_bot/app?startapp=${uId}`;
         });
 
@@ -203,12 +213,15 @@ uRef.once('value').then(s => {
             ? "বক্সের কাজ আপনি আজ শেষ করেছেন! অন্য বক্সে ক্লিক করুন।" 
             : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।";
 
-        adList.innerHTML += `
+        adList.innerHTML += 
         <div class="ad-card">
             <i class="ad-icon">📹</i>
             <div class="ad-title">Rewarded Ad #${i}</div>
-            <button id="ad-btn-${i}" onclick="handleTask('${btnId}', '${currentLink}', 25)" class="btn-verify">
-                Verify 📝
+			<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
+    প্রতিটি বিজ্ঞাপনের জন্য ১৫ টাকা আয় করুন।
+ </p>
+            <button id="ad-btn-${i}" onclick="handleTask('${btnId}', '${currentLink}', 15)" class="btn-verify">
+                Verify <i class="fas fa-check-square"></i>
             </button>
             <p id="msg-${btnId}" style="font-size: 11px; color: #8b949e; margin-top: 10px;">
                 ${statusText}
