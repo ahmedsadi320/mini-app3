@@ -273,19 +273,24 @@ window.onfocus = function() {
                     adsWatched: (d.adsWatched || 0) + 1,
                     completedTasks: completedTasks
                 }).then(() => {
-            tg.showAlert("Bonus claimed✅");
-            
-            // মেসেজ আপডেট করা
+            tg.showAlert("টাকা যোগ হয়েছে। ✅");
+
+            // ১. আগে ইলিমেন্টটি খুঁজে বের করতে হবে
             const msgEl = document.getElementById(`msg-${activeTask.btnId}`);
+            
+            // ২. ইলিমেন্ট পাওয়া গেলে লেখা পরিবর্তন হবে
             if (msgEl) {
-                msgEl.innerText = "কাজের কাজ আপনি আজ শেষ করেছেন! অন্য বক্সে ক্লিক করুন!";
+                msgEl.innerText = "বক্সের কাজ আপনি আজ শেষ করেছেন। অন্য বক্সে ক্লিক করুন।";
             }
 
-            // বাটন কালার পরিবর্তন করা
+            // ৩. বাটন কালার পরিবর্তন
             const btn = document.getElementById(`ad-btn-${activeTask.btnId}`);
-            if (btn) btn.style.background = "#444";
+            if (btn) {
+                btn.style.background = "#444";
+                btn.innerText = "Completed ✅";
+            }
 
-            activeTask = null;
+            activeTask = null
         });
         } else {
             tg.showAlert("১৫ সেকেন্ড পূর্ণ হয়নি! ❌");
