@@ -8,7 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  	<style>
+	<style>
         /* হুবহু ডিজাইন CSS যা আপনি দিয়েছেন */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: #0d1117; color: white; padding-bottom: 90px; }
@@ -89,7 +89,7 @@
         <img id="user-photo" class="u-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
         <div>
             <div id="u-name" class="u-name-text">Loading... <span style="color:#3b82f6">✔️</span></div>
-            <div class="balance-badge">৳ <span id="u-balance">0.00</span> টাকা 💰</div>
+            <div class="balance-badge">৳ <span id="u-balance">0.00</span> Taka 💰</div>
         </div>
     </div>
 
@@ -104,26 +104,26 @@
 			<p>রেফার বোনাস পেতে লিঙ্কটি কপি করে আপনার বন্ধুদের কাছে শেয়ার করুন। প্রতি রেফারে আয় ৪০ টাকা।</p>		
             <div id="ref-url" style="background:#0d1117; padding:12px; border-radius:10px; border:1px dashed #30363d; font-size:10px; color:#58a6ff; margin-bottom:15px; word-break:break-all;">Loading Link...</div>
             <div style="display:flex; gap:10px;">
-                <button onclick="copyRef()" class="btn-blue">কপি লিংক</button>
-                <button onclick="shareRef()" class="btn-green">শেয়ার লিংক</button>
+                <button onclick="copyRef()" class="btn-blue">Copy Referral Link</button>
+                <button onclick="shareRef()" class="btn-green">Share Now</button>
             </div>
         </div>
     </div>
 
     <div id="support" class="page">
-        <h2 style="margin-bottom:15px;">🎧 সাপোর্ট</h2>
+        <h2 style="margin-bottom:15px;">🎧 Support</h2>
         <div class="card" style="background: linear-gradient(145deg, #1c2128, #0d1117);">
             <div style="font-size: 40px; margin-bottom: 10px;">▶️</div>
-            <h3>টিউটোরিয়াল ভিডিও</h3>
-  <p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
-    কিভাবে এখানে আয় করবেন,ভিডিও দেখে শিখে নিন।
-  </p>
-            <button onclick="window.open('https://youtube.com')" class="btn-blue" style="background: #2575fc;">টিউটোরিয়াল দেখুন</button>
+            <h3>𝐓𝐮𝐭𝐨𝐫𝐢𝐚𝐥 𝐕𝐢𝐝𝐞𝐨</h3>
+			<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
+   কিভাবে এখানে আয় করবেন,ভিডিও দেখে শিখে নিন।
+			</p>
+            <button onclick="window.open('https://youtube.com')" class="btn-blue" style="background: #2575fc;">Open Tutorial</button>
         </div>
         <div class="supp-grid">
-            <div class="supp-card" onclick="window.open('https://t.me/YOUR_TG')"><i>✈️</i><span>টেলিগ্রাম</span></div>
-            <div class="supp-card" onclick="window.open('mailto:YOUR_MAIL')"><i>📧</i><span>ইমেইল</span></div>
-            <div class="supp-card" onclick="window.open('https://t.me/YOUR_TG')"><i>💬</i><span>লাইভ চ্যাট</span></div>
+            <div class="supp-card" onclick="window.open('https://t.me/YOUR_TG')"><i>✈️</i><span>Telegram</span></div>
+            <div class="supp-card" onclick="window.open('mailto:YOUR_MAIL')"><i>📧</i><span>Email</span></div>
+            <div class="supp-card" onclick="window.open('https://t.me/YOUR_TG')"><i>💬</i><span>Live Chat</span></div>
             <div class="supp-card" onclick="tg.showAlert('Coming Soon')"><i>❓</i><span>FAQ</span></div>
         </div>
     </div>
@@ -142,24 +142,24 @@
     </div>
 
     <div id="withdraw" class="page">
-        <h2 style="margin-bottom:15px;">💰 টাকা উত্তোলন</h2>
+        <h2 style="margin-bottom:15px;">💰 Withdraw</h2>
         <div class="card" style="text-align: left;">
             <div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                <p style="font-size: 13px; color: #3b82f6; font-weight:bold;">ন্যূনতম উত্তোলনযোগ্য: 800.00 TAKA</p>
+                <p style="font-size: 13px; color: #3b82f6; font-weight:bold;">Minimum Withdraw: 800.00 TAKA</p>
                 <p style="font-size: 11px; color: #f80759; margin-top: 5px; font-weight: 500;">আমরা শুধু পারসোনাল নাম্বারে পেমেন্ট করি!</p>
             </div>
-            <select id="w-method" class="w-input"><option>বিকাশ</option><option>নগদ</option></select>
-            <input type="text" id="w-number" class="w-input" placeholder="একাউন্ট নম্বর">
+            <select id="w-method" class="w-input"><option>BKash</option><option>Nagad</option></select>
+            <input type="text" id="w-number" class="w-input" placeholder="Account Number">
             <input type="number" id="w-amount" class="w-input" placeholder="Amount (Min 800)">
-            <button onclick="submitWithdraw()" class="btn-withdraw">🚀 রিকোয়েস্ট জমা দিন</button>
+            <button onclick="submitWithdraw()" class="btn-withdraw">🚀 Submit Withdraw Request</button>
         </div>
     </div>
 
     <nav class="nav-bar">
-        <button class="nav-item active" onclick="nav('home', this)"><i>🏠</i>হোম</button>
-        <button class="nav-item" onclick="nav('support', this)"><i>🎧</i>সাপোর্ট</button>
-        <button class="nav-item" onclick="nav('tasks', this)"><i>📋</i>টাস্ক</button>
-        <button class="nav-item" onclick="nav('withdraw', this)"><i>💰</i>উইথড্র</button>
+        <button class="nav-item active" onclick="nav('home', this)"><i>🏠</i>Home</button>
+        <button class="nav-item" onclick="nav('support', this)"><i>🎧</i>Support</button>
+        <button class="nav-item" onclick="nav('tasks', this)"><i>📋</i>Tasks</button>
+        <button class="nav-item" onclick="nav('withdraw', this)"><i>💰</i>Withdraw</button>
     </nav>
 
     <script>
@@ -174,7 +174,11 @@
         const uRef = db.ref('users/' + uId);
         let bal = 0;
 
-        // ১. প্রোফাইল ছবি লোড করা
+        uRef.on('value', (s) => {
+    const d = s.val() || {balance:0, referrals:0, adsWatched:0};
+    bal = d.balance || 0;
+
+    // ১. প্রোফাইল ছবি লোড করা
     if (user && user.photo_url) {
         document.getElementById('user-photo').src = user.photo_url;
     }
@@ -183,9 +187,9 @@
     document.getElementById('u-balance').innerText = bal.toFixed(2);
     document.getElementById('u-ref').innerText = d.referrals || 0;
     document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
-    document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">`;
-            document.getElementById('ref-url').innerText = `https://t.me/Red_Chilii_bot/app?startapp=${uId}`;
-        });
+    document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">';
+    document.getElementById('ref-url').innerText = `https://t.me/Red_Chilii_bot/app?startapp=${uid}`;
+});
 
         // আপনার অ্যাড লিঙ্কগুলো
 const adLinks = [
@@ -210,10 +214,10 @@ uRef.once('value').then(s => {
         
         // চেক করা হচ্ছে আজ এই বক্সের কাজ শেষ কি না
         const statusText = (completedTasks[btnId] === today) 
-            ? "বক্সের কাজ আপনি আজ শেষ করেছেন! অন্য বক্সে ক্লিক করুন।" 
+            ? "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।" 
             : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।";
 
-        adList.innerHTML += 
+        adList.innerHTML += `
         <div class="ad-card">
             <i class="ad-icon">📹</i>
             <div class="ad-title">Rewarded Ad #${i}</div>
@@ -294,10 +298,10 @@ window.onfocus = function() {
 
             if(!amtInput || !num) { tg.showAlert("সব তথ্য পূরণ করুন।"); return; }
             if(bal < 800) { tg.showAlert("দুঃখীত পর্যাপ্ত ব্যালেন্স নাই।"); }
-            else if(amt < 800) { tg.showAlert("মিনিমম উইথড্র ৮০০ টাকা।"); }
+            else if(amt < 800) { tg.showAlert("Minimum Withdraw:800 Taka"); }
             else {
                 uRef.update({ balance: bal - amt }).then(() => {
-                    tg.showAlert("উইথড্র রিকুয়েষ্ট সফল হয়েছে✅");
+                    tg.showAlert("Withdraw Request Success✅");
                     document.getElementById('w-amount').value = "";
                     document.getElementById('w-number').value = "";
                 });
@@ -310,12 +314,12 @@ window.onfocus = function() {
             el.value = link; document.body.appendChild(el);
             el.select(); document.execCommand('copy');
             document.body.removeChild(el);
-            tg.showAlert("লিঙ্ক কপি হয়েছে!");
+            tg.showAlert("Link copied");
         }
 
         function shareRef() {
             const link = document.getElementById('ref-url').innerText;
-            tg.openTelegramLink(`https://t.me/share/url?url=${link}&text=আয় করুন সহজে!`);
+            tg.openTelegramLink(`https://t.me/share/url?url=${link}&text=Earn easily!`);
         }
 
         function nav(id, el) {
@@ -324,6 +328,6 @@ window.onfocus = function() {
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
         }
-    </script>
+	</script>
 </body>
-</html>
+	</html>
