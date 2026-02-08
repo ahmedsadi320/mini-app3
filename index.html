@@ -174,17 +174,21 @@
         let bal = 0;
 
         uRef.on('value', (s) => {
-            const d = s.val() || {balance:0, referrals:0, adsWatched:0};
-            bal = d.balance || 0;
-			if (user && user.photo_url) {
-    document.getElementById('user-photo').src = user.photo_url;
-		}
-            document.getElementById('u-balance').innerText = bal.toFixed(2);
-            document.getElementById('u-ref').innerText = d.referrals || 0;
-            document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
-            document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; height: 16px; margin-left: 5px; vertical-align: middle;">';
-            document.getElementById('ref-url').innerText = `https://t.me/Red_Chilii_bot/app?startapp=${uId}`;
-        });
+    const d = s.val() || {balance:0, referrals:0, adsWatched:0};
+    bal = d.balance || 0;
+
+    // ১. প্রোফাইল ছবি লোড করা
+    if (user && user.photo_url) {
+        document.getElementById('user-photo').src = user.photo_url;
+    }
+
+    // ২. ব্লু টিকসহ নাম এবং অন্যান্য তথ্য আপডেট করা
+    document.getElementById('u-balance').innerText = bal.toFixed(2);
+    document.getElementById('u-ref').innerText = d.referrals || 0;
+    document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
+    document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">';
+    document.getElementById('ref-url').innerText = `https://t.me/Red_Chilii_bot/app?startapp=${uid}`;
+});
 
         // আপনার অ্যাড লিঙ্কগুলো
 const adLinks = [
