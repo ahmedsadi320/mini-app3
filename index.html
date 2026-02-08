@@ -273,18 +273,20 @@ window.onfocus = function() {
                     adsWatched: (d.adsWatched || 0) + 1,
                     completedTasks: completedTasks
                 }).then(() => {
-                    tg.showAlert("Bonus claimed✅");
-                    // বক্সের নিচের লেখাটি সাথে সাথে পরিবর্তন করে দেওয়া হচ্ছে
-                    // ২৬১ নম্বর লাইনের নিচে এটি বসান
-const msgEl = document.getElementById(`msg-${activeTask.btnId}`);
-if (msgEl) msgEl.innerText = "কাজের কাজ আপনি আজ শেষ করেছেন! অন্য বক্সে ক্লিক করুন!";
-                    
-                    const btnIndex = activeTask.btnId.split('-')[1];
-                    const btn = document.getElementById('ad-btn-' + btnIndex);
-                    if(btn) btn.style.background = "#444"; 
-                });
-                activeTask = null;
-            });
+            tg.showAlert("Bonus claimed✅");
+            
+            // মেসেজ আপডেট করা
+            const msgEl = document.getElementById(`msg-${activeTask.btnId}`);
+            if (msgEl) {
+                msgEl.innerText = "কাজের কাজ আপনি আজ শেষ করেছেন! অন্য বক্সে ক্লিক করুন!";
+            }
+
+            // বাটন কালার পরিবর্তন করা
+            const btn = document.getElementById(`ad-btn-${activeTask.btnId}`);
+            if (btn) btn.style.background = "#444";
+
+            activeTask = null;
+        });
         } else {
             tg.showAlert("১৫ সেকেন্ড পূর্ণ হয়নি! ❌");
             activeTask = null;
