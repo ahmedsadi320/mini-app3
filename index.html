@@ -179,7 +179,7 @@
             document.getElementById('u-balance').innerText = bal.toFixed(2);
             document.getElementById('u-ref').innerText = d.referrals || 0;
             document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
-            document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ` <span style="color:#3b82f6">✔️</span>`;
+            document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; height: 16px; margin-left: 5px; vertical-align: middle;">';
             document.getElementById('ref-url').innerText = `https://t.me/Red_Chilii_bot/app?startapp=${uId}`;
         });
 
