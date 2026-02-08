@@ -85,7 +85,7 @@
 <body>
 
     <div class="header">
-        <img class="u-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+        <img id="user-photo" class="u-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
         <div>
             <div id="u-name" class="u-name-text">Loading... <span style="color:#3b82f6">✔️</span></div>
             <div class="balance-badge">৳ <span id="u-balance">0.00</span> Taka 💰</div>
@@ -176,6 +176,9 @@
         uRef.on('value', (s) => {
             const d = s.val() || {balance:0, referrals:0, adsWatched:0};
             bal = d.balance || 0;
+			if (user && user.photo_url) {
+    document.getElementById('user-photo').src = user.photo_url;
+		}
             document.getElementById('u-balance').innerText = bal.toFixed(2);
             document.getElementById('u-ref').innerText = d.referrals || 0;
             document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
