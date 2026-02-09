@@ -170,112 +170,112 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const user = tg.initDataUnsafe?.user;
+        const user = tg.initDataUnsafe?.user; // Const কে const করা হয়েছে
         const uId = user?.id || "guest_user";
         const uRef = db.ref('users/' + uId);
         let bal = 0;
-		// ১. প্রোফাইল ডাটা আপডেট (নাম, রেফার লিংক এবং ব্যালেন্স)
-uRef.on('value', (s) => {
-    const d = s.val() || {balance:0, referrals:0, adsWatched:0};
-    bal = d.balance || 0;
 
-    if (user && user.photo_url) {
-        const photoEl = document.getElementById('user-photo');
-        if(photoEl) photoEl.src = user.photo_url;
-    }
+        // আপনার অ্যাড লিঙ্কগুলো (এটি ফাংশনের বাইরে থাকতে হবে)
+        const adLinks = [
+            'https://t.me/fojikapp',
+            'https://t.me/fojikapp',
+            'https://www.effectivegatecpm.com/dxd0u21e?key=ade662ce0e2415294a202b3b5afedbd4',
+            'https://www.effectivegatecpm.com/bnf8sx6u?key=2f6d12f5ca045d5a285e61b1e83e8de1'
+        ];
 
-    // প্রোফাইল কার্ডের ডাটা আপডেট
-    if(document.getElementById('u-balance')) document.getElementById('u-balance').innerText = bal.toFixed(2);
-    if(document.getElementById('u-ref')) document.getElementById('u-ref').innerText = d.referrals || 0;
-    if(document.getElementById('u-ads')) document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
+        // ১. প্রোফাইল ডাটা আপডেট
+        uRef.on('value', (s) => {
+            const d = s.val() || {balance:0, referrals:0, adsWatched:0};
+            bal = d.balance || 0;
 
-    // ব্লু টিকসহ নাম দেখানো
-    const nameEl = document.getElementById('u-name');
-    if(nameEl) {
-        nameEl.innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">';
-    }
+            if (user && user.photo_url) {
+                const photoEl = document.getElementById('user-photo');
+                if(photoEl) photoEl.src = user.photo_url;
+            }
 
-    // রেফার লিংক দেখানো
-    const refUrlEl = document.getElementById('ref-url');
-    if(refUrlEl) {
-        refUrlEl.innerText = `https://t.me/Red_Chilli_bot/app?startapp=${uId}`;
-    }
-});
+            if(document.getElementById('u-balance')) document.getElementById('u-balance').innerText = bal.toFixed(2);
+            if(document.getElementById('u-ref')) document.getElementById('u-ref').innerText = d.referrals || 0;
+            if(document.getElementById('u-ads')) document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
 
-// ২. ৯টি বিজ্ঞাপনের বক্স তৈরি (এই অংশটি বক্স ফিরিয়ে আনবে)
-uRef.once('value').then(s => {
-    const d = s.val() || {};
-    const completedTasks = d.completedTasks || {};
-    const today = new Date().toDateString();
-    const adList = document.getElementById('ad-list');
-    
-    if(!adList) return;
-    adList.innerHTML = ""; 
+            const nameEl = document.getElementById('u-name');
+            if(nameEl) {
+                nameEl.innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">';
+            }
 
-    for(let i=1; i<=9; i++) {
-        const btnId = `ad-${i}`;
-        const currentLink = adLinks[(i-1) % adLinks.length];
-        const isDone = (completedTasks[btnId] === today);
-        
-        const statusText = isDone ? "Daily bonus claimed✅" : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।";
+            const refUrlEl = document.getElementById('ref-url');
+            if(refUrlEl) {
+                refUrlEl.innerText = `https://t.me/Red_Chilli_bot/app?startapp=${uId}`;
+            }
+        });
 
-        adList.innerHTML += `
-        <div class="ad-card">
-            <i class="ad-icon">📹</i>
-            <div class="ad-title">Rewarded Ad #${i}</div>
-            <p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
-                প্রতিটি বিজ্ঞাপনের জন্য ১৫ টাকা আয় করুন।
-            </p>
-            <button id="ad-btn-${i}" onclick="handleTask('${btnId}', '${currentLink}', 15)" class="btn-verify">
-                Verify <i class="fas fa-check-square"></i>
-            </button>
-            <p id="msg-${btnId}" style="font-size: 11px; color: #8b949e; margin-top: 10px;">
-                ${statusText}
-            </p>
-        </div>`;
-    }
-}); // এখানে বক্স তৈরির লজিক শেষ হয়েছে
+        // ২. ৯টি বিজ্ঞাপনের বক্স তৈরি
+        uRef.once('value').then(s => {
+            const d = s.val() || {};
+            const completedTasks = d.completedTasks || {};
+            const today = new Date().toDateString();
+            const adList = document.getElementById('ad-list');
+            
+            if(!adList) return;
+            adList.innerHTML = ""; 
 
-// ৩. অ্যাড হ্যান্ডলার ফাংশন (টাইমার এবং রিওয়ার্ড লজিক)
-function handleTask(btnId, link, amount) {
-    const today = new Date().toDateString();
+            for(let i=1; i<=9; i++) {
+                const btnId = `ad-${i}`;
+                const currentLink = adLinks[(i-1) % adLinks.length];
+                const isDone = (completedTasks[btnId] === today);
+                const statusText = isDone ? "Daily bonus claimed✅" : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।";
 
-    // মনিট্যাগ ইন-অ্যাপ বিজ্ঞাপন চালু করা হচ্ছে
-    show_10588358({
-        type: 'inApp',
-        inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
-    }).then(() => {
-        // ১৫ সেকেন্ডের টাইমার (যাতে ক্লিক করলেই টাকা জমা না হয়)
-        setTimeout(() => {
-            uRef.once('value').then(s => {
-                const d = s.val() || {};
-                const completedTasks = d.completedTasks || {};
+                adList.innerHTML += `
+                <div class="ad-card">
+                    <i class="ad-icon">📹</i>
+                    <div class="ad-title">Rewarded Ad #${i}</div>
+                    <p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
+                        প্রতিটি বিজ্ঞাপনের জন্য ১৫ টাকা আয় করুন।
+                    </p>
+                    <button id="ad-btn-${i}" onclick="handleTask('${btnId}', '${currentLink}', 15)" class="btn-verify">
+                        Verify <i class="fas fa-check-square"></i>
+                    </button>
+                    <p id="msg-${btnId}" style="font-size: 11px; color: #8b949e; margin-top: 10px;">
+                        ${statusText}
+                    </p>
+                </div>`;
+            }
+        });
 
-                // যদি আজ প্রথমবার দেখা হয় তবেই টাকা যোগ হবে
-                if (completedTasks[btnId] !== today) {
-                    const currentBal = d.balance || 0;
-                    completedTasks[btnId] = today;
+        // ৩. অ্যাড হ্যান্ডলার ফাংশন
+        function handleTask(btnId, link, amount) {
+            const today = new Date().toDateString();
 
-                    uRef.update({
-                        balance: currentBal + amount,
-                        adsWatched: (d.adsWatched || 0) + 1,
-                        completedTasks: completedTasks
-                    }).then(() => {
-                        tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
-                        const msgEl = document.getElementById(`msg-${btnId}`);
-                        if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
+            show_10588358({
+                type: 'inApp',
+                inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
+            }).then(() => {
+                setTimeout(() => {
+                    uRef.once('value').then(s => {
+                        const d = s.val() || {};
+                        const completedTasks = d.completedTasks || {};
+
+                        if (completedTasks[btnId] !== today) {
+                            const currentBal = d.balance || 0;
+                            completedTasks[btnId] = today;
+
+                            uRef.update({
+                                balance: currentBal + amount,
+                                adsWatched: (d.adsWatched || 0) + 1,
+                                completedTasks: completedTasks
+                            }).then(() => {
+                                tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
+                                const msgEl = document.getElementById(`msg-${btnId}`);
+                                if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
+                            });
+                        }
                     });
-                }
-                // প্রথম বোনাসের পর আর কোনো মেসেজ বা অ্যালার্ট আসবে না
+                }, 15000); 
+            }).catch(e => {
+                window.open(link, '_blank');
             });
-        }, 15000); 
+        }
 
-    }).catch(e => {
-        // বিজ্ঞাপন না আসলে ব্যাকআপ লিংক
-        window.open(link, '_blank');
-    });
-}
-                        
+        // বাকি ফাংশনগুলো
         function submitWithdraw() {
             const amtInput = document.getElementById('w-amount').value;
             const amt = parseFloat(amtInput);
