@@ -241,15 +241,24 @@ let activeTask = null;
 
 function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
-    
-    // ১. পপআপ বিজ্ঞাপন চালু করা
+    let timeLeft = 15; // ১৫ সেকেন্ডের টাইমার
+
+    // ১. মনিট্যাগ পপআপ চালু করা
     show_10588358('pop').then(() => {
         
-        // ২. বিজ্ঞাপন ওপেন হওয়ার পর ১৫ সেকেন্ডের টাইমার শুরু
-        tg.showAlert("বিজ্ঞাপনে ১৫ সেকেন্ড অপেক্ষা করুন। সময় শেষ হলে রিওয়ার্ড পাবেন।");
-        
+        // ২. টাইমার শুরু করা এবং স্ক্রিনে দেখানো
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                tg.showAlert(`বিজ্ঞাপনে অপেক্ষা করুন: ${timeLeft} সেকেন্ড বাকি`);
+            } else {
+                clearInterval(timerInterval);
+                tg.showAlert("সময় শেষ! এখন রিওয়ার্ড পেতে বিজ্ঞাপনে ক্লিক করুন অথবা ব্যাক করুন।");
+            }
+        }, 1000);
+
+        // ৩. ১৫ সেকেন্ড পর ডাটাবেজে টাকা যোগ করার লজিক
         setTimeout(() => {
-            // ৩. ১৫ সেকেন্ড শেষ হলে টাকা জমা করার লজিক শুরু হবে
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
@@ -262,15 +271,15 @@ function handleTask(btnId, link, amount) {
                         balance: currentBal + amount,
                         completedTasks: completedTasks
                     }).then(() => {
-                        tg.showAlert(`সাফল্য! ১৫ সেকেন্ড পূর্ণ হয়েছে এবং ${amount} টাকা জমা হয়েছে।`);
+                        tg.showAlert(`অভিনন্দন! ১৫ সেকেন্ড পূর্ণ হয়েছে এবং ${amount} টাকা জমা হয়েছে।`);
                         location.reload(); 
                     });
                 }
             });
-        }, 15000); // ১৫০০০ মিলিসেকেন্ড = ১৫ সেকেন্ড
+        }, 15000); // ১৫ সেকেন্ড
 
     }).catch(e => {
-        // বিজ্ঞাপন লোড না হলে সরাসরি লিংকে পাঠাবে
+        // অ্যাড লোড না হলে ব্যাকআপ হিসেবে লিংক ওপেন হবে
         window.open(link, '_blank');
         tg.showAlert("বিজ্ঞাপনটি ১৫ সেকেন্ড দেখুন।");
     });
