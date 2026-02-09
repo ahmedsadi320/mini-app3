@@ -240,33 +240,36 @@ let taskStartTime = 0;
 let activeTask = null;
 
 function handleTask(btnId, amount) {
-    const today = new Date().toDateString(); // আজকের তারিখ
+    const today = new Date().toDateString();
 
     uRef.once('value').then(snapshot => {
         const userData = snapshot.val() || {};
         const completedTasks = userData.completedTasks || {};
 
-        // বিজ্ঞাপন দেখানোর ফাংশন শুরু
+        // ইন-অ্যাপ বিজ্ঞাপন চালু করা হচ্ছে
         show_10588358({
             type: 'inApp',
-            inAppSettings: { frequency: 2, interval: 30, timeout: 5 }
+            inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
         }).then(() => {
-            // যদি ইউজার আজ এই টাস্কটি আগে না করে থাকে
+            
+            // যদি আজ এই টাস্কটি আগে না করা হয়ে থাকে
             if (completedTasks[btnId] !== today) {
                 const newBalance = (userData.balance || 0) + amount;
                 completedTasks[btnId] = today;
 
-                // ডাটাবেজ আপডেট (টাকা যোগ হবে)
                 uRef.update({
                     balance: newBalance,
                     completedTasks: completedTasks
                 }).then(() => {
                     tg.showAlert(`সাফল্য! প্রথমবার দেখার জন্য ${amount} টাকা যোগ হয়েছে।`);
+                    location.reload(); 
                 });
             } else {
-                // যদি আজ একবার দেখা হয়ে যায়
-                tg.showAlert("বিজ্ঞাপনটি সফলভাবে দেখেছেন, তবে আজ আপনি ইতিমধ্যে রিওয়ার্ড পেয়ে গেছেন।");
+                tg.showAlert("বিজ্ঞাপন দেখেছেন, তবে রিওয়ার্ড আজ একবারই পাওয়া যাবে।");
             }
+        }).catch(err => {
+            console.error("Ad failed:", err);
+            tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, আবার চেষ্টা করুন।");
         });
     });
 }
