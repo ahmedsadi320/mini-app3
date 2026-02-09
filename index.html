@@ -239,49 +239,35 @@ uRef.once('value').then(s => {
 let taskStartTime = 0;
 let activeTask = null;
 
-function handleTask(btnId, link, amount) {
-    const today = new Date().toDateString();
+function handleTask(btnId, amount) {
+    const today = new Date().toDateString(); // আজকের তারিখ
 
-    // মনিট্যাগ ইন-অ্যাপ ইন্টারস্টিশিয়াল কল করা হচ্ছে
-    show_10588358({
-        type: 'inApp',
-        inAppSettings: {
-            frequency: 2,
-            capping: 0.1,
-            interval: 30,
-            timeout: 5,
-            everyPage: false
-        }
-    }).then(() => {
-        // বিজ্ঞাপনটি সফলভাবে লোড হলে টাইমার মেসেজ দেখাবে
-        tg.showAlert("বিজ্ঞাপনটি শুরু হয়েছে। টাইমার শেষ হওয়া পর্যন্ত অপেক্ষা করুন।");
+    uRef.once('value').then(snapshot => {
+        const userData = snapshot.val() || {};
+        const completedTasks = userData.completedTasks || {};
 
-        // ১৫ সেকেন্ডের একটি সেফটি টাইমার (যাতে ক্লিক করলেই টাকা জমা না হয়)
-        setTimeout(() => {
-            uRef.once('value').then(s => {
-                const d = s.val() || {};
-                const completedTasks = d.completedTasks || {};
+        // বিজ্ঞাপন দেখানোর ফাংশন শুরু
+        show_10588358({
+            type: 'inApp',
+            inAppSettings: { frequency: 2, interval: 30, timeout: 5 }
+        }).then(() => {
+            // যদি ইউজার আজ এই টাস্কটি আগে না করে থাকে
+            if (completedTasks[btnId] !== today) {
+                const newBalance = (userData.balance || 0) + amount;
+                completedTasks[btnId] = today;
 
-                if (completedTasks[btnId] !== today) {
-                    const currentBal = d.balance || 0;
-                    completedTasks[btnId] = today;
-
-                    // ডাটাবেজ আপডেট করে টাকা জমা করা
-                    uRef.update({
-                        balance: currentBal + amount,
-                        completedTasks: completedTasks
-                    }).then(() => {
-                        tg.showAlert(`সাফল্য! ১৫ সেকেন্ড শেষ হয়েছে এবং ${amount} টাকা জমা হয়েছে।`);
-                        location.reload(); 
-                    });
-                }
-            });
-        }, 15000); // এটি নিশ্চিত করে যে ১৫ সেকেন্ডের আগে টাকা জমা হবে না
-
-    }).catch(e => {
-        // বিজ্ঞাপন না আসলে সরাসরি লিংকে পাঠাবে
-        window.open(link, '_blank');
-        tg.showAlert("বিজ্ঞাপন লোড হয়নি, লিংকটি ভিজিট করুন।");
+                // ডাটাবেজ আপডেট (টাকা যোগ হবে)
+                uRef.update({
+                    balance: newBalance,
+                    completedTasks: completedTasks
+                }).then(() => {
+                    tg.showAlert(`সাফল্য! প্রথমবার দেখার জন্য ${amount} টাকা যোগ হয়েছে।`);
+                });
+            } else {
+                // যদি আজ একবার দেখা হয়ে যায়
+                tg.showAlert("বিজ্ঞাপনটি সফলভাবে দেখেছেন, তবে আজ আপনি ইতিমধ্যে রিওয়ার্ড পেয়ে গেছেন।");
+            }
+        });
     });
 }
 
