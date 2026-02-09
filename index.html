@@ -174,7 +174,7 @@
         const uId = user?.id || "guest_user";
         const uRef = db.ref('users/' + uId);
         let bal = 0;
-		// ১. প্রোফাইল ডাটা আপডেট (নাম ও রেফার লিংক লোড হবে)
+		// ১. প্রোফাইল ডাটা আপডেট (নাম, রেফার লিংক এবং ব্যালেন্স)
 uRef.on('value', (s) => {
     const d = s.val() || {balance:0, referrals:0, adsWatched:0};
     bal = d.balance || 0;
@@ -184,18 +184,18 @@ uRef.on('value', (s) => {
         if(photoEl) photoEl.src = user.photo_url;
     }
 
-    // তথ্য আপডেট (ID অনুযায়ী)
+    // প্রোফাইল কার্ডের ডাটা আপডেট
     if(document.getElementById('u-balance')) document.getElementById('u-balance').innerText = bal.toFixed(2);
     if(document.getElementById('u-ref')) document.getElementById('u-ref').innerText = d.referrals || 0;
     if(document.getElementById('u-ads')) document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
 
-    // ব্লু টিকসহ নাম
+    // ব্লু টিকসহ নাম দেখানো
     const nameEl = document.getElementById('u-name');
     if(nameEl) {
         nameEl.innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">';
     }
 
-    // রেফার লিংক
+    // রেফার লিংক দেখানো
     const refUrlEl = document.getElementById('ref-url');
     if(refUrlEl) {
         refUrlEl.innerText = `https://t.me/Red_Chilli_bot/app?startapp=${uId}`;
@@ -217,7 +217,6 @@ uRef.once('value').then(s => {
         const currentLink = adLinks[(i-1) % adLinks.length];
         const isDone = (completedTasks[btnId] === today);
         
-        // বক্সের নিচে কি লেখা দেখাবে
         const statusText = isDone ? "Daily bonus claimed✅" : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।";
 
         adList.innerHTML += `
@@ -235,24 +234,24 @@ uRef.once('value').then(s => {
             </p>
         </div>`;
     }
-}); // এই ব্র্যাকেটটি অত্যন্ত গুরুত্বপূর্ণ (বক্স তৈরির শেষ সীমা)
+}); // এখানে বক্স তৈরির লজিক শেষ হয়েছে
 
-// ৩. অ্যাড হ্যান্ডলার ফাংশন (টাইমার এবং কোনো বাড়তি মেসেজ ছাড়া)
+// ৩. অ্যাড হ্যান্ডলার ফাংশন (টাইমার এবং রিওয়ার্ড লজিক)
 function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
 
-    // মনিট্যাগ ইন-অ্যাপ ইন্টারস্টিশিয়াল বিজ্ঞাপন
+    // মনিট্যাগ ইন-অ্যাপ বিজ্ঞাপন চালু করা হচ্ছে
     show_10588358({
         type: 'inApp',
         inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
     }).then(() => {
-        // ১৫ সেকেন্ডের টাইমার
+        // ১৫ সেকেন্ডের টাইমার (যাতে ক্লিক করলেই টাকা জমা না হয়)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // যদি প্রথমবার বোনাস নেওয়া হয়
+                // যদি আজ প্রথমবার দেখা হয় তবেই টাকা যোগ হবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -267,17 +266,16 @@ function handleTask(btnId, link, amount) {
                         if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
                 }
-                // প্রথম বোনাসের পর আর কোনো মেসেজ দিবে না
+                // প্রথম বোনাসের পর আর কোনো মেসেজ বা অ্যালার্ট আসবে না
             });
         }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন না আসলে সরাসরি লিংক
+        // বিজ্ঞাপন না আসলে ব্যাকআপ লিংক
         window.open(link, '_blank');
     });
 }
-                    
- 
+                        
         function submitWithdraw() {
             const amtInput = document.getElementById('w-amount').value;
             const amt = parseFloat(amtInput);
