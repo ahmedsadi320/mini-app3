@@ -240,21 +240,31 @@ let activeTask = null;
 
 function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
-    uRef.once('value').then(s => {
-        const d = s.val() || {};
-        const completedTasks = d.completedTasks || {};
-
-        window.open(link, '_blank');
-        taskStartTime = Date.now();
+    
+    // মনিট্যাগ থেকে পাওয়া রিওয়ার্ডেড পপআপ কমান্ডটি এখানে শুরু হচ্ছে
+    show_10588358('pop').then(() => {
         
-        // যদি কাজ আগে শেষ না হয়ে থাকে, তবেই টাকা যোগ করার জন্য activeTask সেট হবে
-        if (completedTasks[btnId] !== today) {
-            activeTask = { amount: amount, btnId: btnId };
-            tg.showAlert("বিজ্ঞাপনে ১৫ সেকেন্ড থাকুন।");
-        } else {
-            activeTask = null; // কাজ শেষ থাকলে টাকা যোগ হবে না, শুধু এড দেখা যাবে
-            tg.showAlert("Daily bonus claimed✅");
-        }
+        // বিজ্ঞাপনটি সফলভাবে লোড হলে এবং ইউজার দেখলে এই অংশ কাজ করবে
+        uRef.once('value').then(s => {
+            const d = s.val() || {};
+            const completedTasks = d.completedTasks || {};
+
+            // কাজ যদি আজকের জন্য বাকি থাকে
+            if (completedTasks[btnId] !== today) {
+                activeTask = { amount: amount, btnId: btnId };
+                taskStartTime = Date.now();
+                tg.showAlert("বিজ্ঞাপনে ১৫ সেকেন্ড থাকুন। রিওয়ার্ড পেতে ওখানেই ক্লিক করুন।");
+            } else {
+                activeTask = null;
+                tg.showAlert("Daily bonus claimed✅");
+            }
+        });
+
+    }).catch(e => {
+        // যদি পপআপ অ্যাড কোনো কারণে লোড না হয়, তবে ব্যাকআপ হিসেবে পুরোনো লিংক ওপেন হবে
+        console.error("Ad error:", e);
+        window.open(link, '_blank');
+        tg.showAlert("বিজ্ঞাপন লোড হতে সমস্যা হয়েছে, লিংকটি ভিউ করুন।");
     });
 }
 
