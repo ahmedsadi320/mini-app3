@@ -174,43 +174,32 @@
         const uId = user?.id || "guest_user";
         const uRef = db.ref('users/' + uId);
         let bal = 0;
-		// ১. প্রোফাইল ডাটা লোড করা (নাম, ব্যালেন্স এবং রেফার লিংক)
+		// ১. প্রোফাইল ডাটা আপডেট (নাম, রেফার লিংক ইত্যাদি)
 uRef.on('value', (s) => {
     const d = s.val() || {balance: 0, referrals: 0, adsWatched: 0};
     bal = d.balance || 0;
 
-    // প্রোফাইল ছবি
     if (user && user.photo_url) {
         const photoEl = document.getElementById('user-photo');
         if(photoEl) photoEl.src = user.photo_url;
     }
 
-    // তথ্য আপডেট (ID চেক করে)
     if(document.getElementById('u-balance')) document.getElementById('u-balance').innerText = bal.toFixed(2);
     if(document.getElementById('u-ref')) document.getElementById('u-ref').innerText = d.referrals || 0;
     if(document.getElementById('u-ads')) document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
 
-    // ব্লু টিকসহ নাম আপডেট
     const nameEl = document.getElementById('u-name');
     if(nameEl) {
         nameEl.innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">';
     }
 
-    // রেফার লিংক আপডেট
     const refUrlEl = document.getElementById('ref-url');
     if(refUrlEl) {
         refUrlEl.innerText = `https://t.me/Red_Chilli_bot/app?startapp=${uId}`;
     }
 });
 
-// ২. ৯টি বিজ্ঞাপনের বক্স বা টাস্ক তৈরি করা
-const adLinks = [
-    'https://t.me/fojikapp',
-    'https://t.me/fojikapp',
-    'https://www.effectivegatecpm.com/dxd0u21e?key=ade662ce0e2415294a202b3b5afedbd4',
-    'https://www.effectivegatecpm.com/bnf8sx6u?key=2f6d12f5ca045d5a285e61b1e83e8de1'
-];
-
+// ২. ৯টি বিজ্ঞাপনের বক্স তৈরি (স্টাইল পরিবর্তন হবে না)
 uRef.once('value').then(s => {
     const d = s.val() || {};
     const completedTasks = d.completedTasks || {};
@@ -222,7 +211,6 @@ uRef.once('value').then(s => {
     for(let i=1; i<=9; i++) {
         const btnId = `ad-${i}`;
         const currentLink = adLinks[(i-1) % adLinks.length];
-        // চেক করা হচ্ছে আজ এই বক্সের কাজ শেষ কি না
         const statusText = (completedTasks[btnId] === today) 
             ? "Daily bonus claimed✅" 
             : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।";
@@ -241,7 +229,10 @@ uRef.once('value').then(s => {
                 ${statusText}
             </p>
         </div>`;
+    }
+}); // এখানে বক্স তৈরির ব্র্যাকেট শেষ হয়েছে
 
+// ৩. অ্যাড হ্যান্ডলার ফাংশন (টাইমার ও রিওয়ার্ড লজিক)
 function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
 
@@ -249,12 +240,13 @@ function handleTask(btnId, link, amount) {
         type: 'inApp',
         inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
     }).then(() => {
-        // প্রথমবার বোনাস পাওয়ার জন্য ১৫ সেকেন্ডের টাইমার
+        // ১৫ সেকেন্ডের টাইমার
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
+                // যদি আজ বোনাস না পেয়ে থাকে তবেই আপডেট হবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -269,19 +261,17 @@ function handleTask(btnId, link, amount) {
                         if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
                 }
-                // এখানে কোনো else নেই, তাই দ্বিতীয়বার অ্যাড দেখলে কোনো মেসেজ আসবে না।
+                // প্রথম বোনাসের পর আর কোনো মেসেজ দিবে না
             });
         }, 15000); 
 
     }).catch(e => {
+        // বিজ্ঞাপন না আসলে সরাসরি লিংক
         window.open(link, '_blank');
     });
 }
-        tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, লিংকটি ১৫ সেকেন্ড ভিজিট করুন।");
-    });
-			 }
- 
 
+ 
         function submitWithdraw() {
             const amtInput = document.getElementById('w-amount').value;
             const amt = parseFloat(amtInput);
