@@ -222,51 +222,39 @@ uRef.once('value').then(s => {
     for(let i=1; i<=9; i++) {
         const btnId = `ad-${i}`;
         const currentLink = adLinks[(i-1) % adLinks.length];
-        const isDone = completedTasks[btnId] === today;
-        
+        // চেক করা হচ্ছে আজ এই বক্সের কাজ শেষ কি না
+        const statusText = (completedTasks[btnId] === today) 
+            ? "Daily bonus claimed✅" 
+            : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।";
+
         adList.innerHTML += `
-        <div class="ad-card" style="${isDone ? 'opacity: 0.8;' : ''}">
+        <div class="ad-card">
             <i class="ad-icon">📹</i>
             <div class="ad-title">Rewarded Ad #${i}</div>
             <p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
                 প্রতিটি বিজ্ঞাপনের জন্য ১৫ টাকা আয় করুন।
             </p>
-            <button id="ad-btn-${i}" 
-                onclick="handleTask('${btnId}', '${currentLink}', 15)" 
-                class="btn-verify" style="${isDone ? 'background: #444;' : ''}">
-                ${isDone ? 'Claimed ✅' : 'Verify <i class="fas fa-check-square"></i>'}
+            <button id="ad-btn-${i}" onclick="handleTask('${btnId}', '${currentLink}', 15)" class="btn-verify">
+                Verify <i class="fas fa-check-square"></i>
             </button>
             <p id="msg-${btnId}" style="font-size: 11px; color: #8b949e; margin-top: 10px;">
-                ${isDone ? "আজকের বোনাস নেওয়া হয়েছে। আরও দেখতে ক্লিক করুন।" : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।"}
+                ${statusText}
             </p>
         </div>`;
-    }
-});
 
-// ৩. Monetag Interstitial অ্যাড হ্যান্ডলার ফাংশন (টাইমার এবং রিওয়ার্ড লজিক)
 function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
 
-    // মনিট্যাগ ইন-অ্যাপ ইন্টারস্টিশিয়াল বিজ্ঞাপন চালু
     show_10588358({
         type: 'inApp',
-        inAppSettings: {
-            frequency: 2,
-            capping: 0.1,
-            interval: 30,
-            timeout: 5,
-            everyPage: false
-        }
+        inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
     }).then(() => {
-        tg.showAlert("বিজ্ঞাপন শুরু হয়েছে। টাইমার শেষ না হওয়া পর্যন্ত টাকা যোগ হবে না।");
-
-        // ১৫ সেকেন্ডের সেফটি টাইমার (যাতে ক্লিক করলেই টাকা না পায়)
+        // প্রথমবার বোনাস পাওয়ার জন্য ১৫ সেকেন্ডের টাইমার
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // যদি আজ এই টাস্কটি আগে না করা হয়ে থাকে তবেই টাকা যোগ হবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -277,17 +265,18 @@ function handleTask(btnId, link, amount) {
                         completedTasks: completedTasks
                     }).then(() => {
                         tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
-                        location.reload(); 
+                        const msgEl = document.getElementById(`msg-${btnId}`);
+                        if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
-                } else {
-                    tg.showAlert("বিজ্ঞাপন দেখেছেন, তবে আজকের পুরস্কার আপনি আগেই নিয়ে ফেলেছেন!");
                 }
+                // এখানে কোনো else নেই, তাই দ্বিতীয়বার অ্যাড দেখলে কোনো মেসেজ আসবে না।
             });
-        }, 15000); // ১৫ সেকেন্ডের টাইমার
+        }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন না আসলে ব্যাকআপ লিংক
         window.open(link, '_blank');
+    });
+}
         tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, লিংকটি ১৫ সেকেন্ড ভিজিট করুন।");
     });
 			 }
