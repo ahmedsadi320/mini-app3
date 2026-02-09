@@ -174,36 +174,7 @@
         const uId = user?.id || "guest_user";
         const uRef = db.ref('users/' + uId);
         let bal = 0;
-
-        uRef.on('value', (s) => {
-    const d = s.val() || {balance:0, referrals:0, adsWatched:0};
-    bal = d.balance || 0;
-
-    // ১. প্রোফাইল ছবি লোড করা
-    if (user && user.photo_url) {
-        document.getElementById('user-photo').src = user.photo_url;
-    }
-
-    // ২. ব্লু টিকসহ নাম এবং অন্যান্য তথ্য আপডেট করা
-    document.getElementById('u-balance').innerText = bal.toFixed(2);
-    document.getElementById('u-ref').innerText = d.referrals || 0;
-    document.getElementById('u-ads').innerText = (d.adsWatched || 0) + " / 9";
-    document.getElementById('u-name').innerHTML = (user ? user.first_name : "User") + ' <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" style="width: 16px; vertical-align: middle; margin-left: 5px;">';
-    document.getElementById('ref-url').innerText = `https://t.me/crypto_passbot/app?startapp=${uId}`;
-});
-
-        // আপনার অ্যাড লিঙ্কগুলো
-const adLinks = [
-    'https://otieu.com/4/10588504',
-    'https://otieu.com/4/10588503',
-    'https://www.effectivegatecpm.com/dxd0u21e?key=ade662ce0e2415294a202b3b5afedbd4',
-    'https://www.effectivegatecpm.com/bnf8sx6u?key=2f6d12f5ca045d5a285e61b1e83e8de1'
-];
-
-const adList = document.getElementById('ad-list');
-adList.innerHTML = ""; 
-
-// ডাটাবেজ থেকে চেক করে বক্স তৈরি
+		// ১. শুধু এই লজিকটি রাখুন যা বক্সগুলো তৈরি করবে
 uRef.once('value').then(s => {
     const d = s.val() || {};
     const completedTasks = d.completedTasks || {};
@@ -211,69 +182,67 @@ uRef.once('value').then(s => {
 
     for(let i=1; i<=9; i++) {
         const btnId = `ad-${i}`;
-        const currentLink = adLinks[(i-1) % adLinks.length];
-        
-        // চেক করা হচ্ছে আজ এই বক্সের কাজ শেষ কি না
-        const statusText = (completedTasks[btnId] === today) 
-            ? "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।" 
-            : "পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।";
-
+        // প্রতিটি বক্সের জন্য ১৫ সেকেন্ডের শর্ত সেট করা হচ্ছে
         adList.innerHTML += `
         <div class="ad-card">
             <i class="ad-icon">📹</i>
             <div class="ad-title">Rewarded Ad #${i}</div>
-			<p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
-    প্রতিটি বিজ্ঞাপনের জন্য ১৫ টাকা আয় করুন।
- </p>
-            <button id="ad-btn-${i}" onclick="handleTask('${btnId}', '${currentLink}', 15)" class="btn-verify">
+            <p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
+                প্রতিটি বিজ্ঞাপনের জন্য ১৫ টাকা আয় করুন।
+            </p>
+            <button id="ad-btn-${i}" onclick="handleTask('${btnId}', 15)" class="btn-verify">
                 Verify <i class="fas fa-check-square"></i>
             </button>
             <p id="msg-${btnId}" style="font-size: 11px; color: #8b949e; margin-top: 10px;">
-                ${statusText}
+                পুরস্কার পেতে ১৫ সেকেন্ড বিজ্ঞাপনে থাকুন।
             </p>
         </div>`;
     }
 });
 
-        // ১৫ সেকেন্ড ভেরিফিকেশন এবং ইউনিক বক্স লজিক
-let taskStartTime = 0;
-let activeTask = null;
-
+// ২. এরপর সরাসরি handleTask ফাংশনটি শুরু হবে (মাঝের window.onfocus অংশটি বাদ দিন)
 function handleTask(btnId, amount) {
+    // এখানে আপনার নতুন টাইমার লজিক থাকবে...
+}
+		// ২. হ্যান্ডেল টাস্ক ফাংশন (মনিট্যাগ টাইমার সহ)
+function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
 
     uRef.once('value').then(snapshot => {
         const userData = snapshot.val() || {};
         const completedTasks = userData.completedTasks || {};
 
-        // ইন-অ্যাপ বিজ্ঞাপন চালু করা হচ্ছে
+        // ইন-অ্যাপ বিজ্ঞাপন চালু
         show_10588358({
             type: 'inApp',
             inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
         }).then(() => {
             
-            // যদি আজ এই টাস্কটি আগে না করা হয়ে থাকে
-            if (completedTasks[btnId] !== today) {
-                const newBalance = (userData.balance || 0) + amount;
-                completedTasks[btnId] = today;
+            // ১৫ সেকেন্ডের টাইমার পর রিওয়ার্ড চেক
+            setTimeout(() => {
+                if (completedTasks[btnId] !== today) {
+                    const newBalance = (userData.balance || 0) + amount;
+                    completedTasks[btnId] = today;
 
-                uRef.update({
-                    balance: newBalance,
-                    completedTasks: completedTasks
-                }).then(() => {
-                    tg.showAlert(`সাফল্য! প্রথমবার দেখার জন্য ${amount} টাকা যোগ হয়েছে।`);
-                    location.reload(); 
-                });
-            } else {
-                tg.showAlert("বিজ্ঞাপন দেখেছেন, তবে রিওয়ার্ড আজ একবারই পাওয়া যাবে।");
-            }
+                    uRef.update({
+                        balance: newBalance,
+                        adsWatched: (userData.adsWatched || 0) + 1,
+                        completedTasks: completedTasks
+                    }).then(() => {
+                        tg.showAlert(`সাফল্য! ১৫ সেকেন্ড পূর্ণ হয়েছে এবং ${amount} টাকা যোগ হয়েছে।`);
+                    });
+                } else {
+                    tg.showAlert("বিজ্ঞাপন দেখেছেন, তবে আজ আর টাকা যোগ হবে না।");
+                }
+            }, 15000); // ১৫ সেকেন্ড
+
         }).catch(err => {
-            console.error("Ad failed:", err);
-            tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, আবার চেষ্টা করুন।");
+            window.open(link, '_blank');
+            tg.showAlert("বিজ্ঞাপন লোড হয়নি, লিংকটি ১৫ সেকেন্ড দেখুন।");
         });
     });
 }
-
+        
         function submitWithdraw() {
             const amtInput = document.getElementById('w-amount').value;
             const amt = parseFloat(amtInput);
