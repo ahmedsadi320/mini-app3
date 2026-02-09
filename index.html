@@ -242,35 +242,37 @@ let activeTask = null;
 function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // মনিট্যাগ পপআপ চালু করার কমান্ড
+    // ১. পপআপ বিজ্ঞাপন চালু করা
     show_10588358('pop').then(() => {
         
-        // বিজ্ঞাপন সফলভাবে শেষ হলে এই অংশটি টাকা জমা করবে
-        uRef.once('value').then(s => {
-            const d = s.val() || {};
-            const completedTasks = d.completedTasks || {};
+        // ২. বিজ্ঞাপন ওপেন হওয়ার পর ১৫ সেকেন্ডের টাইমার শুরু
+        tg.showAlert("বিজ্ঞাপনে ১৫ সেকেন্ড অপেক্ষা করুন। সময় শেষ হলে রিওয়ার্ড পাবেন।");
+        
+        setTimeout(() => {
+            // ৩. ১৫ সেকেন্ড শেষ হলে টাকা জমা করার লজিক শুরু হবে
+            uRef.once('value').then(s => {
+                const d = s.val() || {};
+                const completedTasks = d.completedTasks || {};
 
-            if (completedTasks[btnId] !== today) {
-                // ডাটাবেজে টাকা যোগ করার লজিক
-                const currentBal = d.balance || 0;
-                completedTasks[btnId] = today;
+                if (completedTasks[btnId] !== today) {
+                    const currentBal = d.balance || 0;
+                    completedTasks[btnId] = today;
 
-                uRef.update({
-                    balance: currentBal + amount,
-                    completedTasks: completedTasks
-                }).then(() => {
-                    tg.showAlert(`অভিনন্দন! ${amount} টাকা জমা হয়েছে।`);
-                    location.reload(); // ব্যালেন্স আপডেট দেখানোর জন্য
-                });
-            } else {
-                tg.showAlert("এই টাস্কটি আজ আগেই শেষ করেছেন।");
-            }
-        });
+                    uRef.update({
+                        balance: currentBal + amount,
+                        completedTasks: completedTasks
+                    }).then(() => {
+                        tg.showAlert(`সাফল্য! ১৫ সেকেন্ড পূর্ণ হয়েছে এবং ${amount} টাকা জমা হয়েছে।`);
+                        location.reload(); 
+                    });
+                }
+            });
+        }, 15000); // ১৫০০০ মিলিসেকেন্ড = ১৫ সেকেন্ড
 
     }).catch(e => {
-        // যদি বিজ্ঞাপন না আসে, তবেই কেবল বাইরের লিংক ওপেন হবে
+        // বিজ্ঞাপন লোড না হলে সরাসরি লিংকে পাঠাবে
         window.open(link, '_blank');
-        tg.showAlert("বিজ্ঞাপন লোড হয়নি, লিংকটি ভিজিট করুন।");
+        tg.showAlert("বিজ্ঞাপনটি ১৫ সেকেন্ড দেখুন।");
     });
 }
 
