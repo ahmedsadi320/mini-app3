@@ -274,39 +274,6 @@ function handleTask(btnId, amount) {
     });
 }
 
-window.onfocus = function() {
-    if (activeTask) {
-        const timeSpent = (Date.now() - taskStartTime) / 1000;
-        if (timeSpent >= 15) {
-            const today = new Date().toDateString();
-            uRef.once('value').then(s => {
-                const d = s.val() || {};
-                let completedTasks = d.completedTasks || {};
-                completedTasks[activeTask.btnId] = today;
-
-                uRef.update({ 
-                    balance: bal + activeTask.amount, 
-                    adsWatched: (d.adsWatched || 0) + 1,
-                    completedTasks: completedTasks
-                }).then(() => {
-                    tg.showAlert("bonus claimed✅");
-                    // বক্সের নিচের লেখাটি সাথে সাথে পরিবর্তন করে দেওয়া হচ্ছে
-                    const msgEl = document.getElementById(`msg-${activeTask.btnId}`);
-                    if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
-                    
-                    const btnIndex = activeTask.btnId.split('-')[1];
-                    const btn = document.getElementById('ad-btn-' + btnIndex);
-                    if(btn) btn.style.background = "#444"; 
-                });
-                activeTask = null;
-            });
-        } else {
-            tg.showAlert("১৫ সেকেন্ড পূর্ণ হয়নি! ❌");
-            activeTask = null;
-        }
-    }
-};
-
         function submitWithdraw() {
             const amtInput = document.getElementById('w-amount').value;
             const amt = parseFloat(amtInput);
