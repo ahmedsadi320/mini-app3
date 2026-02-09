@@ -241,23 +241,22 @@ let activeTask = null;
 
 function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
-    let timeLeft = 15; // ১৫ সেকেন্ডের টাইমার
 
-    // ১. মনিট্যাগ পপআপ চালু করা
-    show_10588358('pop').then(() => {
-        
-        // ২. টাইমার শুরু করা এবং স্ক্রিনে দেখানো
-        const timerInterval = setInterval(() => {
-            timeLeft--;
-            if (timeLeft > 0) {
-                tg.showAlert(`বিজ্ঞাপনে অপেক্ষা করুন: ${timeLeft} সেকেন্ড বাকি`);
-            } else {
-                clearInterval(timerInterval);
-                tg.showAlert("সময় শেষ! এখন রিওয়ার্ড পেতে বিজ্ঞাপনে ক্লিক করুন অথবা ব্যাক করুন।");
-            }
-        }, 1000);
+    // মনিট্যাগ ইন-অ্যাপ ইন্টারস্টিশিয়াল কল করা হচ্ছে
+    show_10588358({
+        type: 'inApp',
+        inAppSettings: {
+            frequency: 2,
+            capping: 0.1,
+            interval: 30,
+            timeout: 5,
+            everyPage: false
+        }
+    }).then(() => {
+        // বিজ্ঞাপনটি সফলভাবে লোড হলে টাইমার মেসেজ দেখাবে
+        tg.showAlert("বিজ্ঞাপনটি শুরু হয়েছে। টাইমার শেষ হওয়া পর্যন্ত অপেক্ষা করুন।");
 
-        // ৩. ১৫ সেকেন্ড পর ডাটাবেজে টাকা যোগ করার লজিক
+        // ১৫ সেকেন্ডের একটি সেফটি টাইমার (যাতে ক্লিক করলেই টাকা জমা না হয়)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
@@ -267,21 +266,22 @@ function handleTask(btnId, link, amount) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
 
+                    // ডাটাবেজ আপডেট করে টাকা জমা করা
                     uRef.update({
                         balance: currentBal + amount,
                         completedTasks: completedTasks
                     }).then(() => {
-                        tg.showAlert(`অভিনন্দন! ১৫ সেকেন্ড পূর্ণ হয়েছে এবং ${amount} টাকা জমা হয়েছে।`);
+                        tg.showAlert(`সাফল্য! ১৫ সেকেন্ড শেষ হয়েছে এবং ${amount} টাকা জমা হয়েছে।`);
                         location.reload(); 
                     });
                 }
             });
-        }, 15000); // ১৫ সেকেন্ড
+        }, 15000); // এটি নিশ্চিত করে যে ১৫ সেকেন্ডের আগে টাকা জমা হবে না
 
     }).catch(e => {
-        // অ্যাড লোড না হলে ব্যাকআপ হিসেবে লিংক ওপেন হবে
+        // বিজ্ঞাপন না আসলে সরাসরি লিংকে পাঠাবে
         window.open(link, '_blank');
-        tg.showAlert("বিজ্ঞাপনটি ১৫ সেকেন্ড দেখুন।");
+        tg.showAlert("বিজ্ঞাপন লোড হয়নি, লিংকটি ভিজিট করুন।");
     });
 }
 
