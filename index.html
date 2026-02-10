@@ -243,23 +243,35 @@
 
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
-    const btn = document.getElementById(`ad-btn-${btnId.split('-')[1]}`); // বাটন সিলেক্ট করা
-    const originalText = btn.innerHTML; // আগের লেখা সেভ রাখা
+    // বাটনের আইডি খুঁজে বের করা (ad-btn-1, ad-btn-2 ইত্যাদি)
+    const btnNum = btnId.split('-')[1];
+    const btn = document.getElementById(`ad-btn-${btnNum}`);
+    
+    if (!btn) return;
 
-    // ক্লিক করার সাথে সাথে বাটন 'Loading...' হয়ে যাবে
+    const originalText = btn.innerHTML; // আগের লেখা (Verify...) সেভ রাখা
+
+    // ১. ক্লিক করার সাথে সাথে বাটন 'Loading...' হয়ে যাবে
     btn.innerText = "Loading...";
-    btn.disabled = true; // যাতে বারবার ক্লিক করতে না পারে
+    btn.disabled = true; // বারবার ক্লিক বন্ধ করা
 
     show_10588358({
         type: 'inApp',
-        inAppSettings: { frequency: 9, capping: 0.1, interval: 0, timeout: 0, everyPage: false }
+        inAppSettings: { 
+            frequency: 1, // একবার ক্লিক করলে একটাই এড আসবে
+            capping: 0.1, 
+            interval: 0, 
+            timeout: 0, 
+            everyPage: false 
+        }
     }).then(() => {
-        // বিজ্ঞাপন শুরু হলে বাটন আবার আগের মতো হবে
+        // ২. বিজ্ঞাপন লোড হয়ে গেলে বাটন আবার আগের মতো হবে
         btn.innerHTML = originalText;
         btn.disabled = false;
         
-        tg.showAlert("বিজ্ঞাপন শুরু হয়েছে। ১৫ সেকেন্ড অপেক্ষা করুন।");
+        tg.showAlert("বিজ্ঞাপন শুরু হয়েছে। পুরস্কার পেতে ১৫ সেকেন্ড অপেক্ষা করুন।");
 
+        // ১৫ সেকেন্ডের রিওয়ার্ড টাইমার
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
@@ -283,7 +295,7 @@
         }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন না আসলে বাটন আগের মতো হয়ে যাবে এবং লিংক ওপেন হবে
+        // ৩. বিজ্ঞাপন না আসলে বা এরর হলে বাটন আগের মতো হয়ে যাবে
         btn.innerHTML = originalText;
         btn.disabled = false;
         window.open(link, '_blank');
