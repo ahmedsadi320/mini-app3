@@ -241,39 +241,56 @@
             }
         });
 
-        // ৩. অ্যাড হ্যান্ডলার ফাংশন
         function handleTask(btnId, link, amount) {
-            const today = new Date().toDateString();
+    const today = new Date().toDateString();
+    const btn = document.getElementById(`ad-btn-${btnId.split('-')[1]}`); // বাটন সিলেক্ট করা
+    const originalText = btn.innerHTML; // আগের লেখা সেভ রাখা
 
-            show_10588358({
-                type: 'inApp',
-                inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
-            }).then(() => {
-                setTimeout(() => {
-                    uRef.once('value').then(s => {
-                        const d = s.val() || {};
-                        const completedTasks = d.completedTasks || {};
+    // ক্লিক করার সাথে সাথে বাটন 'Loading...' হয়ে যাবে
+    btn.innerText = "Loading...";
+    btn.disabled = true; // যাতে বারবার ক্লিক করতে না পারে
 
-                        if (completedTasks[btnId] !== today) {
-                            const currentBal = d.balance || 0;
-                            completedTasks[btnId] = today;
+    show_10588358({
+        type: 'inApp',
+        inAppSettings: { frequency: 9, capping: 0.1, interval: 0, timeout: 0, everyPage: false }
+    }).then(() => {
+        // বিজ্ঞাপন শুরু হলে বাটন আবার আগের মতো হবে
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        tg.showAlert("বিজ্ঞাপন শুরু হয়েছে। ১৫ সেকেন্ড অপেক্ষা করুন।");
 
-                            uRef.update({
-                                balance: currentBal + amount,
-                                adsWatched: (d.adsWatched || 0) + 1,
-                                completedTasks: completedTasks
-                            }).then(() => {
-                                tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
-                                const msgEl = document.getElementById(`msg-${btnId}`);
-                                if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
-                            });
-                        }
+        setTimeout(() => {
+            uRef.once('value').then(s => {
+                const d = s.val() || {};
+                const completedTasks = d.completedTasks || {};
+
+                if (completedTasks[btnId] !== today) {
+                    const currentBal = d.balance || 0;
+                    completedTasks[btnId] = today;
+
+                    uRef.update({
+                        balance: currentBal + amount,
+                        adsWatched: (d.adsWatched || 0) + 1,
+                        completedTasks: completedTasks
+                    }).then(() => {
+                        tg.showAlert(`সাফল্য! ${amount} টাকা জমা হয়েছে।`);
+                        const msgEl = document.getElementById(`msg-${btnId}`);
+                        if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
-                }, 15000); 
-            }).catch(e => {
-                window.open(link, '_blank');
+                }
             });
-        }
+        }, 15000); 
+
+    }).catch(e => {
+        // বিজ্ঞাপন না আসলে বাটন আগের মতো হয়ে যাবে এবং লিংক ওপেন হবে
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        window.open(link, '_blank');
+        tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, লিংকটি ১৫ সেকেন্ড ভিজিট করুন।");
+    });
+		}
+        
 
         // বাকি ফাংশনগুলো
         function submitWithdraw() {
