@@ -244,27 +244,27 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // বাটনের আইডি সঠিকভাবে ধরা (আপনার HTML অনুযায়ী ad-btn-1)
+    // ১. বাটনের আইডি সঠিকভাবে ধরা (যাতে Loading... লেখা সাথে সাথে আসে)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     if (btn) {
-        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে এটি আসবে
-        btn.style.pointerEvents = "none"; // ডাবল ক্লিক বন্ধ
+        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে লোডিং আসবে
+        btn.style.pointerEvents = "none"; 
     }
 
-    // ইন-অ্যাপ বিজ্ঞাপন কল করার সেটিংস
+    // ২. মনিট্যাগের দেওয়া লজিককে আপনার চাহিদা অনুযায়ী পরিবর্তন:
     show_10588358({
         type: 'inApp', 
         inAppSettings: { 
-            frequency: 1,      // এক ক্লিকে একটি মাত্র বিজ্ঞাপন
-            capping: 0,        // কোনো লিমিট নেই, যতবার খুশি ক্লিক করা যাবে
-            interval: 0, 
-            timeout: 0, 
-            everyPage: true    // সেশন কিল করা যাতে অটো-প্লে না হয়
+            frequency: 1,      // আপনি ১টি অ্যাড চেয়েছেন (তারা ২ দিয়েছিলো)
+            capping: 0,        // কোনো বিরতি বা টাইম লিমিট থাকবে না
+            interval: 0,       // একটির পর অন্যটির জন্য ৩০ সেকেন্ড অপেক্ষা করতে হবে না
+            timeout: 0,        // কোনো ৫ সেকেন্ডের দেরি হবে না, সাথে সাথে আসবে
+            everyPage: true    // সেশন রিসেট হবে (১ মানে রিসেট, যা আপনি চেয়েছিলেন)
         }
     }).then(() => {
-        // বিজ্ঞাপন শুরু হয়ে গেলে বাটন আবার 'Verify' হয়ে যাবে
+        // অ্যাড শুরু হলে বাটন আবার 'Verify' হয়ে যাবে যাতে ইউজার আবার ক্লিক করতে পারে
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
@@ -276,7 +276,7 @@
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // দিনে কেবল একবারই টাকা যোগ হবে
+                // ৯টি বক্সে যতবার খুশি অ্যাড দেখবে, কিন্তু দিনে একবারই টাকা পাবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -287,22 +287,19 @@
                         completedTasks: completedTasks
                     }).then(() => {
                         tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
-                        const msgEl = document.getElementById(`msg-${btnId}`);
-                        if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
                 }
             });
         }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন না আসলে বা এরর হলে বাটন ঠিক করে লিংকে পাঠানো
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
         }
         window.open(link, '_blank');
     });
-							}
+		}
         
 
         // বাকি ফাংশনগুলো
