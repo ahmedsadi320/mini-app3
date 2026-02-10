@@ -244,39 +244,38 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // ১. আপনার HTML এর ad-btn-1 আইডিটি সঠিকভাবে ধরা
+    // বাটন আইডি সঠিকভাবে ধরা (যাতে Loading... অবশ্যই আসে)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     if (btn) {
-        btn.innerText = "Loading..."; // এটি এখন অবশ্যই কাজ করবে
+        btn.innerText = "Loading..."; 
         btn.style.pointerEvents = "none"; 
     }
 
-    // ২. মনিট্যাগকে নির্দেশ দিচ্ছি এক ক্লিকের পর সেশন কিল করতে
+    // ইন-অ্যাপ স্ক্রিপ্ট কল করার আগে আগের সেশন ক্লিন করার লজিক
     show_10588358({
         type: 'inApp', 
         inAppSettings: { 
-            frequency: 1,      // ২ নয়, ১ ক্লিকে ১টি অ্যাড দেখাবে
-            capping: 0,        // কোনো ৬ মিনিটের লিমিট নেই
-            interval: 0,       // কোনো ৩০ সেকেন্ডের বিরতি নেই
-            timeout: 0,        // কোনো ৫ সেকেন্ডের দেরি নেই, সাথে সাথে আসবে
-            everyPage: true    // সেশন রিসেট হবে (তারা false দিয়েছিল যা ভুল)
+            frequency: 1,      // ২ নয়, ১ টি অ্যাড
+            capping: 0,        // কোনো সময়ের বাধা নেই
+            interval: 0,       // কোনো বিরতি নেই
+            timeout: 0,        // সাথে সাথে আসবে
+            everyPage: true    // সেশন কিল করা (যাতে লুপ না হয়)
         }
     }).then(() => {
-        // অ্যাড শুরু হলে বাটন আগের অবস্থায় ফিরবে
+        // অ্যাড শুরু হওয়ার সাথে সাথে বাটন আবার স্বাভাবিক হবে
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
         }
 
-        // ৩. টাকা জমার টাইমার (১৫ সেকেন্ড)
+        // টাকা জমার টাইমার
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // প্রতিদিন প্রথমবার টাকা পাবে, পরের বার কেবল অ্যাড দেখবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
