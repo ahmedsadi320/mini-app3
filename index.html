@@ -232,6 +232,11 @@
         // ১. প্রোফাইল ডাটা আপডেট
         uRef.on('value', (s) => {
             const d = s.val() || {balance:0, referrals:0, adsWatched:0};
+			const today = new Date().toDateString();
+    if (d.last_reset_day !== today) {
+        uRef.update({ adsWatched: 0, last_reset_day: today });
+        return; 
+	}
             bal = d.balance || 0;
 
             if (user && user.photo_url) {
