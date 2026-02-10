@@ -278,30 +278,30 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // ১. বাটনের আইডি সঠিকভাবে ধরা (Loading... নিশ্চিত করতে)
+    // বাটনের আইডি ধরা (Loading... দেখানোর জন্য)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     if (btn) {
-        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে এটি আসবে
-        btn.style.pointerEvents = "none"; // অ্যাড লোড হওয়ার আগে ডাবল ক্লিক বন্ধ
+        btn.innerText = "Loading..."; 
+        btn.style.pointerEvents = "none"; 
     }
 
-    // ২. রিওয়ার্ডেড পপআপ কল করা (এক ক্লিকে একটি অ্যাড গ্যারান্টি)
-    show_10588358().then(() => {
-        // বিজ্ঞাপন শুরু হলে বাটন আবার 'Verify' হয়ে যাবে যাতে ইউজার আবার ক্লিক করতে পারে
+    // মনিট্যাগের দেওয়া নতুন Rewarded Popup ফাংশন
+    show_10588358('pop').then(() => {
+        // বিজ্ঞাপন শুরু হলে বাটন আবার স্বাভাবিক হবে
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
         }
 
-        // ৩. অ্যাড দেখা শেষ হলে ১৫ সেকেন্ড পর টাকা জমা হবে
+        // ১৫ সেকেন্ডের টাইমার (পুরস্কারের জন্য)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // দিনে কেবল একবারই প্রতি বক্সে টাকা যোগ হবে, কিন্তু অ্যাড আনলিমিটেড দেখা যাবে
+                // ৯টি বক্সে যতবার খুশি অ্যাড দেখবে, কিন্তু দিনে একবারই টাকা পাবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -317,7 +317,7 @@
         }, 15000); 
 
     }).catch(e => {
-        // যদি অ্যাড না আসে তবে বাটন ঠিক করে ব্যাকআপ লিংকে পাঠানো
+        // বিজ্ঞাপন লোড না হলে ব্যাকআপ লিংকে পাঠানো
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
