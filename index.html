@@ -244,43 +244,42 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // ১. বাটনের আইডি সঠিকভাবে ধরা (যাতে Loading... লেখা সাথে সাথে আসে)
+    // ১. আপনার HTML এর ad-btn-1 আইডিটি সঠিকভাবে ধরা
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     if (btn) {
-        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে লোডিং আসবে
+        btn.innerText = "Loading..."; // এটি এখন অবশ্যই কাজ করবে
         btn.style.pointerEvents = "none"; 
     }
 
-    // ২. মনিট্যাগের দেওয়া লজিককে আপনার চাহিদা অনুযায়ী পরিবর্তন:
+    // ২. মনিট্যাগকে নির্দেশ দিচ্ছি এক ক্লিকের পর সেশন কিল করতে
     show_10588358({
         type: 'inApp', 
         inAppSettings: { 
-            frequency: 1,      // আপনি ১টি অ্যাড চেয়েছেন (তারা ২ দিয়েছিলো)
-            capping: 0,        // কোনো বিরতি বা টাইম লিমিট থাকবে না
-            interval: 0,       // একটির পর অন্যটির জন্য ৩০ সেকেন্ড অপেক্ষা করতে হবে না
-            timeout: 0,        // কোনো ৫ সেকেন্ডের দেরি হবে না, সাথে সাথে আসবে
-            everyPage: true    // সেশন রিসেট হবে (১ মানে রিসেট, যা আপনি চেয়েছিলেন)
+            frequency: 1,      // ২ নয়, ১ ক্লিকে ১টি অ্যাড দেখাবে
+            capping: 0,        // কোনো ৬ মিনিটের লিমিট নেই
+            interval: 0,       // কোনো ৩০ সেকেন্ডের বিরতি নেই
+            timeout: 0,        // কোনো ৫ সেকেন্ডের দেরি নেই, সাথে সাথে আসবে
+            everyPage: true    // সেশন রিসেট হবে (তারা false দিয়েছিল যা ভুল)
         }
     }).then(() => {
-        // অ্যাড শুরু হলে বাটন আবার 'Verify' হয়ে যাবে যাতে ইউজার আবার ক্লিক করতে পারে
+        // অ্যাড শুরু হলে বাটন আগের অবস্থায় ফিরবে
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
         }
 
-        // ১৫ সেকেন্ডের টাইমার (টাকা জমার জন্য)
+        // ৩. টাকা জমার টাইমার (১৫ সেকেন্ড)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // ৯টি বক্সে যতবার খুশি অ্যাড দেখবে, কিন্তু দিনে একবারই টাকা পাবে
+                // প্রতিদিন প্রথমবার টাকা পাবে, পরের বার কেবল অ্যাড দেখবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
-
                     uRef.update({
                         balance: currentBal + amount,
                         adsWatched: (d.adsWatched || 0) + 1,
