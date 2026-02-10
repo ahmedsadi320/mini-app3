@@ -253,7 +253,6 @@
 
     // ১. ক্লিক করার সাথে সাথে বাটন 'Loading...' হয়ে যাবে
     btn.innerText = "Loading...";
-    btn.disabled = true; // বারবার ক্লিক বন্ধ করা
 
     show_10588358({
         type: 'inApp',
@@ -269,7 +268,6 @@
         btn.innerHTML = originalText;
         btn.disabled = false;
         
-        tg.showAlert("বিজ্ঞাপন শুরু হয়েছে। পুরস্কার পেতে ১৫ সেকেন্ড অপেক্ষা করুন।");
 
         // ১৫ সেকেন্ডের রিওয়ার্ড টাইমার
         setTimeout(() => {
