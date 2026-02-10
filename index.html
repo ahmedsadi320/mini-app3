@@ -82,6 +82,23 @@
         .nav-item { color: #8b949e; text-align: center; font-size: 11px; flex: 1; border: none; background: none; cursor: pointer; }
         .nav-item i { display: block; font-size: 22px; margin-bottom: 4px; font-style: normal; }
         .nav-item.active { color: #3b82f6; }
+		.input-group { margin-bottom: 15px; }
+.input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #e0e0e0; }
+.input-group label i { color: #3b82f6; margin-right: 5px; }
+
+.w-input { 
+    width: 100%; 
+    background: #0d1117; 
+    border: 1px solid #30363d; 
+    border-radius: 10px; 
+    padding: 14px; 
+    color: white; 
+    outline: none; 
+    font-size: 14px; 
+    transition: 0.3s;
+}
+
+.w-input:focus { border-color: #3b82f6; box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
     </style>
 </head>
 <body>
@@ -143,18 +160,35 @@
     </div>
 
     <div id="withdraw" class="page">
-        <h2 style="margin-bottom:15px;">💰 Withdraw</h2>
-        <div class="card" style="text-align: left;">
-            <div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                <p style="font-size: 13px; color: #3b82f6; font-weight:bold;">Minimum Withdraw: 800.00 TAKA</p>
-                <p style="font-size: 11px; color: #f80759; margin-top: 5px; font-weight: 500;">আমরা শুধু পারসোনাল নাম্বারে পেমেন্ট করি!</p>
-            </div>
-            <select id="w-method" class="w-input"><option>BKash</option><option>Nagad</option></select>
-            <input type="text" id="w-number" class="w-input" placeholder="Account Number">
-            <input type="number" id="w-amount" class="w-input" placeholder="Amount (Min 800)">
-            <button onclick="submitWithdraw()" class="btn-withdraw">🚀 Submit Withdraw Request</button>
+    <h2 style="margin-bottom:15px;">💰 Withdraw</h2>
+    <div class="card" style="text-align: left;">
+        <div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+            <p style="font-size: 13px; color: #3b82f6; font-weight:bold;">Minimum Withdraw: 800.00 TAKA</p>
+            <p style="font-size: 11px; color: #f80759; margin-top: 5px; font-weight: 500;">আমরা শুধু পারসোনাল নাম্বারে পেমেন্ট করি!</p>
         </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-credit-card"></i> পদ্ধতি নির্বাচন করুন</label>
+            <select id="w-method" class="w-input">
+                <option value="">একটি পদ্ধতি নির্বাচন করুন</option>
+                <option value="BKash">BKash</option>
+                <option value="Nagad">Nagad</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-address-card"></i> একাউন্ট নম্বর</label>
+            <input type="text" id="w-number" class="w-input" placeholder="01XXXXXXXXX">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-money-bill-wave"></i> Amount (TAKA)</label>
+            <input type="number" id="w-amount" class="w-input" placeholder="ন্যূনতম 800.00 TAKA">
+        </div>
+
+        <button onclick="submitWithdraw()" class="btn-withdraw">🚀 Submit Withdraw Request</button>
     </div>
+	</div>
 
     <nav class="nav-bar">
         <button class="nav-item active" onclick="nav('home', this)"><i>🏠</i>Home</button>
@@ -295,21 +329,31 @@
 
         // বাকি ফাংশনগুলো
         function submitWithdraw() {
-            const amtInput = document.getElementById('w-amount').value;
-            const amt = parseFloat(amtInput);
-            const num = document.getElementById('w-number').value;
+    const method = document.getElementById('w-method').value; // পদ্ধতি ধরার জন্য
+    const amtInput = document.getElementById('w-amount').value;
+    const amt = parseFloat(amtInput);
+    const num = document.getElementById('w-number').value;
 
-            if(!amtInput || !num) { tg.showAlert("সব তথ্য পূরণ করুন।"); return; }
-            if(bal < 800) { tg.showAlert("দুঃখীত পর্যাপ্ত ব্যালেন্স নাই।"); }
-            else if(amt < 800) { tg.showAlert("Minimum Withdraw:800 Taka"); }
-            else {
-                uRef.update({ balance: bal - amt }).then(() => {
-                    tg.showAlert("Withdraw Request Successful✅");
-                    document.getElementById('w-amount').value = "";
-                    document.getElementById('w-number').value = "";
-                });
-            }
-        }
+    if(!method || !amtInput || !num) { 
+        tg.showAlert("সব তথ্য পূরণ করুন।"); 
+        return; 
+    }
+    
+    if(bal < 800) { 
+        tg.showAlert("দুঃখীত পর্যাপ্ত ব্যালেন্স নাই।"); 
+    }
+    else if(amt < 800) { 
+        tg.showAlert("Minimum Withdraw: 800 Taka"); 
+    }
+    else {
+        uRef.update({ balance: bal - amt }).then(() => {
+            tg.showAlert("Withdraw Request Successful✅");
+            document.getElementById('w-amount').value = "";
+            document.getElementById('w-number').value = "";
+            document.getElementById('w-method').value = ""; // রিসেট
+        });
+    }
+		}
 
         function copyRef() {
             const link = document.getElementById('ref-url').innerText;
