@@ -244,41 +244,40 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // বাটনের আইডি সঠিকভাবে ধরা (যাতে Loading... লেখা আসে)
+    // ১. বাটনের আইডি সঠিকভাবে ধরা (আপনার HTML অনুযায়ী)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     let originalContent = "";
     if (btn) {
         originalContent = btn.innerHTML; 
-        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে লেখা পরিবর্তন হবে
-        btn.style.pointerEvents = "none"; // লোড হওয়া পর্যন্ত ক্লিক সাময়িক বন্ধ
+        btn.innerText = "Loading..."; // এটি এখন অবশ্যই কাজ করবে
+        btn.style.pointerEvents = "none"; 
     }
 
-    // একবার ক্লিকে একবার বিজ্ঞাপন নিশ্চিত করার সেটিংস
+    // ২. বারবার এড আসা বন্ধ করতে 'interstitial' টাইপ ব্যবহার করুন
+    // ইন-অ্যাপ ইন্টারস্টিশিয়াল অনেক সময় লুপ করে, তাই সাধারণ ইন্টারস্টিশিয়াল ভালো
     show_10588358({
-        type: 'inApp', 
+        type: 'interstitial', 
         inAppSettings: { 
-            frequency: 1,      // এক ক্লিকে কেবল একটি বিজ্ঞাপন
-            capping: 0,        // কোনো লিমিট নেই, যতবার খুশি ক্লিক করা যাবে
-            interval: 0,       // কোনো বিরতি থাকবে না
-            timeout: 0,        // ক্লিক করার সাথে সাথেই লোড হবে
-            everyPage: true    // সেশন রিসেট হবে যাতে অটো-নেক্সট এড না আসে
+            frequency: 1,      // এক ক্লিকে একটি এড
+            capping: 0,        // কোনো লিমিট নেই
+            interval: 0, 
+            timeout: 0, 
+            everyPage: true    // সেশন কিল করবে
         }
     }).then(() => {
-        // বিজ্ঞাপন শুরু হলে বাটন আবার আগের লেখায় ফিরে আসবে
+        // এড শুরু হলে বাটন ঠিক হয়ে যাবে
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
         }
 
-        // ১৫ সেকেন্ডের টাইমার (টাকা জমার জন্য)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // দিনে একবার টাকা পাওয়ার লজিক
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -297,7 +296,6 @@
         }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন না আসলে বাটন ঠিক হয়ে যাবে এবং লিংকে পাঠাবে
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
