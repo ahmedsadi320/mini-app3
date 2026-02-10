@@ -244,24 +244,24 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // ১. বাটনের আইডি সঠিকভাবে ধরা (যাতে Loading... লেখা সাথে সাথে আসে)
+    // ১. বাটনের সঠিক আইডি ধরা (যাতে Loading... লেখা সাথে সাথে আসে)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     let originalContent = "";
     if (btn) {
         originalContent = btn.innerHTML; 
-        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে এটি আসবে
-        btn.style.pointerEvents = "none"; // লোড হওয়া পর্যন্ত ডাবল ক্লিক বন্ধ
+        btn.innerText = "Loading..."; // এটি এখন অবশ্যই কাজ করবে
+        btn.disabled = true; // বিজ্ঞাপন লোড হওয়া পর্যন্ত বাটন লক রাখা
     }
 
-    // ২. আনলিমিটেড ক্লিক এবং সিঙ্গল অ্যাড সেটিংস
+    // ২. মনিট্যাগ সেটিংস: এক ক্লিকে একবার এবং আনলিমিটেড সেশন
     show_10588358({
         type: 'inApp', 
         inAppSettings: { 
-            frequency: 1,      // এক ক্লিকে কেবল একটি বিজ্ঞাপন
+            frequency: 1,      // একবার ক্লিকে কেবল একটি বিজ্ঞাপন
             capping: 0,        // কোনো লিমিট নেই, যতবার খুশি ক্লিক করা যাবে
-            interval: 0,       // কোনো বিরতি থাকবে না
+            interval: 0, 
             timeout: 0, 
             everyPage: true    // সেশন রিসেট করা যাতে অটো-প্লে না হয়
         }
@@ -269,16 +269,16 @@
         // বিজ্ঞাপন শুরু হলে বাটন আবার আগের অবস্থায় ফিরে আসবে
         if (btn) {
             btn.innerHTML = originalContent;
-            btn.style.pointerEvents = "auto";
+            btn.disabled = false; // আবার ক্লিক করার সুযোগ দেওয়া
         }
 
-        // ৩. টাকা জমার টাইমার (১৫ সেকেন্ড)
+        // ৩. টাকা জমার লজিক (১৫ সেকেন্ড টাইমার)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // দিনে একবার টাকা পাওয়ার লজিক (৯টি বক্সের জন্য আলাদা আলাদা চেক)
+                // চেক করা হচ্ছে আজ এই নির্দিষ্ট বক্স থেকে টাকা আগে নিয়েছে কি না
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -292,22 +292,19 @@
                         const msgEl = document.getElementById(`msg-${btnId}`);
                         if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
-                } else {
-                    // যদি ইউজার আজ একবার টাকা পেয়ে থাকে, তবে পরের বার শুধু অ্যাড দেখাবে
-                    console.log("আজকের বোনাস নেওয়া হয়েছে, শুধু বিজ্ঞাপন দেখানো হলো।");
                 }
             });
         }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন না আসলে ব্যাকআপ লিংকে পাঠানো
+        // বিজ্ঞাপন না আসলে বা এরর হলে বাটন ঠিক করে লিংকে পাঠানো
         if (btn) {
             btn.innerHTML = originalContent;
-            btn.style.pointerEvents = "auto";
+            btn.disabled = false;
         }
         window.open(link, '_blank');
     });
-							}
+		}
         
 
         // বাকি ফাংশনগুলো
