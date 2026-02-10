@@ -244,45 +244,46 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // বাটনের সঠিক আইডি খুঁজে বের করা (যেমন: ad-btn-1)
-    const btnNum = btnId.split('-')[1]; 
+    // ১. বাটনের সঠিক আইডি ধরা (ad-btn-1 ইত্যাদি)
+    const btnNum = btnId.replace('ad-', ''); 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     let originalContent = "";
     if (btn) {
-        originalContent = btn.innerHTML; // আগের লেখা (Verify...) সেভ রাখা
-        btn.innerText = "Loading..."; // ক্লিক করলেই সরাসরি লোডিং দেখাবে
-        btn.style.pointerEvents = "none"; // লোডিং অবস্থায় ক্লিক বন্ধ
-        btn.style.opacity = "0.7";
+        originalContent = btn.innerHTML; 
+        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে লোডিং দেখাবে
+        btn.style.pointerEvents = "none"; // লোড হওয়া পর্যন্ত ক্লিক বন্ধ
     }
 
+    // ২. আনলিমিটেড বিজ্ঞাপনের জন্য মনিট্যাগ সেটিংস
     show_10588358({
         type: 'inApp',
         inAppSettings: { 
-            frequency: 1, 
-            capping: 0.1, 
-            interval: 0, 
-            timeout: 0, 
+            frequency: 100, // দিনে ১০০ বার বা তার বেশি দেখার সুযোগ
+            capping: 0,     // কোনো সীমাবদ্ধতা নেই
+            interval: 0,    // একটা শেষ করে সাথে সাথে অন্যটা দেখা যাবে
+            timeout: 0,     // দেরি হবে না
             everyPage: false 
         }
     }).then(() => {
-        // বিজ্ঞাপন শুরু হয়ে গেলে বাটন আবার আগের মতো হবে কিন্তু মেসেজ আসবে না
+        // বিজ্ঞাপন শুরু হলে বাটন আবার আগের মতো হবে
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
-            btn.style.opacity = "1";
         }
 
-        // ১৫ সেকেন্ডের টাইমার (পুরস্কারের জন্য)
+        // ৩. টাকা জমার টাইমার (১৫ সেকেন্ড)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
+                // চেক করা হচ্ছে আজ এই বক্স থেকে টাকা আগে নিয়েছে কি না
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
 
+                    // ডাটাবেজে টাকা এবং অ্যাড কাউন্ট আপডেট
                     uRef.update({
                         balance: currentBal + amount,
                         adsWatched: (d.adsWatched || 0) + 1,
@@ -292,6 +293,9 @@
                         const msgEl = document.getElementById(`msg-${btnId}`);
                         if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
+                } else {
+                    // যদি আগেই টাকা নিয়ে থাকে, তবে শুধু এই ছোট মেসেজটি কনসোলে থাকবে বা চাইলে সাইলেন্ট রাখা যায়
+                    console.log("বিজ্ঞাপন দেখেছেন, তবে আজকের বোনাস আগেই নেওয়া হয়েছে।");
                 }
             });
         }, 15000); 
@@ -301,7 +305,6 @@
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
-            btn.style.opacity = "1";
         }
         window.open(link, '_blank');
     });
