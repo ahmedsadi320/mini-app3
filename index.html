@@ -244,41 +244,39 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // ১. বাটনের সঠিক আইডি ধরা (যাতে Loading... লেখা সাথে সাথে আসে)
+    // বাটনের আইডি সঠিকভাবে ধরা (আপনার HTML অনুযায়ী ad-btn-1)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
-    let originalContent = "";
     if (btn) {
-        originalContent = btn.innerHTML; 
-        btn.innerText = "Loading..."; // এটি এখন অবশ্যই কাজ করবে
-        btn.disabled = true; // বিজ্ঞাপন লোড হওয়া পর্যন্ত বাটন লক রাখা
+        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে এটি আসবে
+        btn.style.pointerEvents = "none"; // ডাবল ক্লিক বন্ধ
     }
 
-    // ২. মনিট্যাগ সেটিংস: এক ক্লিকে একবার এবং আনলিমিটেড সেশন
+    // ইন-অ্যাপ বিজ্ঞাপন কল করার সেটিংস
     show_10588358({
         type: 'inApp', 
         inAppSettings: { 
-            frequency: 1,      // একবার ক্লিকে কেবল একটি বিজ্ঞাপন
+            frequency: 1,      // এক ক্লিকে একটি মাত্র বিজ্ঞাপন
             capping: 0,        // কোনো লিমিট নেই, যতবার খুশি ক্লিক করা যাবে
             interval: 0, 
             timeout: 0, 
-            everyPage: true    // সেশন রিসেট করা যাতে অটো-প্লে না হয়
+            everyPage: true    // সেশন কিল করা যাতে অটো-প্লে না হয়
         }
     }).then(() => {
-        // বিজ্ঞাপন শুরু হলে বাটন আবার আগের অবস্থায় ফিরে আসবে
+        // বিজ্ঞাপন শুরু হয়ে গেলে বাটন আবার 'Verify' হয়ে যাবে
         if (btn) {
-            btn.innerHTML = originalContent;
-            btn.disabled = false; // আবার ক্লিক করার সুযোগ দেওয়া
+            btn.innerText = "Verify";
+            btn.style.pointerEvents = "auto";
         }
 
-        // ৩. টাকা জমার লজিক (১৫ সেকেন্ড টাইমার)
+        // ১৫ সেকেন্ডের টাইমার (টাকা জমার জন্য)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // চেক করা হচ্ছে আজ এই নির্দিষ্ট বক্স থেকে টাকা আগে নিয়েছে কি না
+                // দিনে কেবল একবারই টাকা যোগ হবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -299,12 +297,12 @@
     }).catch(e => {
         // বিজ্ঞাপন না আসলে বা এরর হলে বাটন ঠিক করে লিংকে পাঠানো
         if (btn) {
-            btn.innerHTML = originalContent;
-            btn.disabled = false;
+            btn.innerText = "Verify";
+            btn.style.pointerEvents = "auto";
         }
         window.open(link, '_blank');
     });
-		}
+							}
         
 
         // বাকি ফাংশনগুলো
