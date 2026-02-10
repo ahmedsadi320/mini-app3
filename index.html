@@ -244,34 +244,36 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // সরাসরি বাটনের আইডি তৈরি করা হচ্ছে
-    const buttonId = `ad-btn-${btnId.split('-')[1]}`;
-    const btn = document.getElementById(buttonId);
+    // বাটনের সঠিক আইডি খুঁজে বের করা (যেমন: ad-btn-1)
+    const btnNum = btnId.split('-')[1]; 
+    const btn = document.getElementById(`ad-btn-${btnNum}`);
     
+    let originalContent = "";
     if (btn) {
-        var originalContent = btn.innerHTML; // আগের লেখা ও আইকন সেভ রাখা
-        btn.innerText = "Loading..."; // ক্লিক করলেই লোডিং দেখাবে
-        btn.style.pointerEvents = "none"; // ডাবল ক্লিক বন্ধ
+        originalContent = btn.innerHTML; // আগের লেখা (Verify...) সেভ রাখা
+        btn.innerText = "Loading..."; // ক্লিক করলেই সরাসরি লোডিং দেখাবে
+        btn.style.pointerEvents = "none"; // লোডিং অবস্থায় ক্লিক বন্ধ
+        btn.style.opacity = "0.7";
     }
 
     show_10588358({
         type: 'inApp',
         inAppSettings: { 
-            frequency: 1, // বারবার এড আসা বন্ধ হবে
+            frequency: 1, 
             capping: 0.1, 
             interval: 0, 
             timeout: 0, 
             everyPage: false 
         }
     }).then(() => {
-        // বিজ্ঞাপন শুরু হলে বাটন আবার আগের মতো হবে
+        // বিজ্ঞাপন শুরু হয়ে গেলে বাটন আবার আগের মতো হবে কিন্তু মেসেজ আসবে না
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
+            btn.style.opacity = "1";
         }
-        
-        tg.showAlert("বিজ্ঞাপন শুরু হয়েছে। ১৫ সেকেন্ড অপেক্ষা করুন।");
 
+        // ১৫ সেকেন্ডের টাইমার (পুরস্কারের জন্য)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
@@ -286,7 +288,7 @@
                         adsWatched: (d.adsWatched || 0) + 1,
                         completedTasks: completedTasks
                     }).then(() => {
-                        tg.showAlert(`সাফল্য! ${amount} টাকা জমা হয়েছে।`);
+                        tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
                         const msgEl = document.getElementById(`msg-${btnId}`);
                         if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
@@ -295,13 +297,13 @@
         }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন না আসলে বাটন আগের মতো হবে এবং লিংকে পাঠাবে
+        // বিজ্ঞাপন না আসলে বাটন ঠিক হয়ে যাবে এবং লিংকে পাঠাবে
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
+            btn.style.opacity = "1";
         }
         window.open(link, '_blank');
-        tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, লিংকটি ভিজিট করুন।");
     });
 		}
         
