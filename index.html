@@ -244,30 +244,29 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // ১. বাটনের আইডি সঠিকভাবে ধরা (আপনার HTML অনুযায়ী)
+    // বাটন আইডি সঠিকভাবে ধরা (আপনার HTML অনুযায়ী ad-btn-1)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     let originalContent = "";
     if (btn) {
         originalContent = btn.innerHTML; 
-        btn.innerText = "Loading..."; // এটি এখন অবশ্যই কাজ করবে
+        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথেই এটি আসবে
         btn.style.pointerEvents = "none"; 
     }
 
-    // ২. বারবার এড আসা বন্ধ করতে 'interstitial' টাইপ ব্যবহার করুন
-    // ইন-অ্যাপ ইন্টারস্টিশিয়াল অনেক সময় লুপ করে, তাই সাধারণ ইন্টারস্টিশিয়াল ভালো
+    // টাইপ আবার 'inApp' এ ফিরিয়ে আনা হলো কারণ আপনার এটাই একটিভ আছে
     show_10588358({
-        type: 'interstitial', 
+        type: 'inApp', 
         inAppSettings: { 
-            frequency: 1,      // এক ক্লিকে একটি এড
-            capping: 0,        // কোনো লিমিট নেই
+            frequency: 1,      // এক ক্লিকে একটি অ্যাড
+            capping: 0, 
             interval: 0, 
             timeout: 0, 
-            everyPage: true    // সেশন কিল করবে
+            everyPage: true    // অটো-নেক্সট অ্যাড বন্ধ করতে এটি জরুরি
         }
     }).then(() => {
-        // এড শুরু হলে বাটন ঠিক হয়ে যাবে
+        // অ্যাড সাকসেসফুলি আসলে বাটন ঠিক হবে
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
@@ -296,11 +295,12 @@
         }, 15000); 
 
     }).catch(e => {
+        // অ্যাড না আসলে (error) বাটন ঠিক হয়ে যাবে এবং সরাসরি ব্যাকআপ লিংক খুলবে
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
         }
-        window.open(link, '_blank');
+        window.open(link, '_blank'); // অ্যাড না আসলে ইউজারের ইনকাম যাতে বন্ধ না হয়
     });
 		}
         
