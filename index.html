@@ -277,8 +277,6 @@
 
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
-    
-    // বাটনের আইডি ধরা (Loading... দেখানোর জন্য)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
@@ -287,21 +285,19 @@
         btn.style.pointerEvents = "none"; 
     }
 
-    // মনিট্যাগের দেওয়া নতুন Rewarded Popup ফাংশন
+    // Rewarded Popup কল করা
     show_10588358('pop').then(() => {
-        // বিজ্ঞাপন শুরু হলে বাটন আবার স্বাভাবিক হবে
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
         }
 
-        // ১৫ সেকেন্ডের টাইমার (পুরস্কারের জন্য)
+        // ১৫ সেকেন্ডের টাইমার শুরু
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
-                // ৯টি বক্সে যতবার খুশি অ্যাড দেখবে, কিন্তু দিনে একবারই টাকা পাবে
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -311,18 +307,22 @@
                         completedTasks: completedTasks
                     }).then(() => {
                         tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
+                        // মেসেজ আপডেট
+                        const msgEl = document.getElementById(`msg-${btnId}`);
+                        if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
                 }
             });
         }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন লোড না হলে ব্যাকআপ লিংকে পাঠানো
+        // বিজ্ঞাপন না আসলে টেলিগ্রামের ভেতর লিংক ওপেন করা
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
         }
-        window.open(link, '_blank');
+        // window.open এর বদলে এটি ব্যবহার করুন
+        tg.openLink(link); 
     });
 		}
         
