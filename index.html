@@ -244,7 +244,7 @@
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
     
-    // বাটনের আইডি সঠিক করা (যাতে Loading... লেখা সাথে সাথে আসে)
+    // ১. বাটনের আইডি সঠিকভাবে ধরা (যাতে Loading... লেখা সাথে সাথে আসে)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
@@ -252,32 +252,33 @@
     if (btn) {
         originalContent = btn.innerHTML; 
         btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে এটি আসবে
-        btn.style.pointerEvents = "none"; // লোডিং অবস্থায় ক্লিক বন্ধ
+        btn.style.pointerEvents = "none"; // লোড হওয়া পর্যন্ত ডাবল ক্লিক বন্ধ
     }
 
-    // ইন-অ্যাপ বিজ্ঞাপন কল করা
+    // ২. আনলিমিটেড ক্লিক এবং সিঙ্গল অ্যাড সেটিংস
     show_10588358({
         type: 'inApp', 
         inAppSettings: { 
-            frequency: 1,      // একবার ক্লিকে একটি বিজ্ঞাপন
-            capping: 0.1, 
-            interval: 0, 
+            frequency: 1,      // এক ক্লিকে কেবল একটি বিজ্ঞাপন
+            capping: 0,        // কোনো লিমিট নেই, যতবার খুশি ক্লিক করা যাবে
+            interval: 0,       // কোনো বিরতি থাকবে না
             timeout: 0, 
-            everyPage: true    // সেশন রিসেট করা
+            everyPage: true    // সেশন রিসেট করা যাতে অটো-প্লে না হয়
         }
     }).then(() => {
-        // বিজ্ঞাপন শুরু হলে বাটন আগের অবস্থায় ফিরিয়ে আনা
+        // বিজ্ঞাপন শুরু হলে বাটন আবার আগের অবস্থায় ফিরে আসবে
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
         }
 
-        // টাকা জমার টাইমার (১৫ সেকেন্ড)
+        // ৩. টাকা জমার টাইমার (১৫ সেকেন্ড)
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
                 const completedTasks = d.completedTasks || {};
 
+                // দিনে একবার টাকা পাওয়ার লজিক (৯টি বক্সের জন্য আলাদা আলাদা চেক)
                 if (completedTasks[btnId] !== today) {
                     const currentBal = d.balance || 0;
                     completedTasks[btnId] = today;
@@ -291,20 +292,22 @@
                         const msgEl = document.getElementById(`msg-${btnId}`);
                         if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
                     });
+                } else {
+                    // যদি ইউজার আজ একবার টাকা পেয়ে থাকে, তবে পরের বার শুধু অ্যাড দেখাবে
+                    console.log("আজকের বোনাস নেওয়া হয়েছে, শুধু বিজ্ঞাপন দেখানো হলো।");
                 }
             });
         }, 15000); 
 
     }).catch(e => {
-        // বিজ্ঞাপন লোড না হলে বা এরর আসলে ব্যাকআপ লিংকে পাঠানো
+        // বিজ্ঞাপন না আসলে ব্যাকআপ লিংকে পাঠানো
         if (btn) {
             btn.innerHTML = originalContent;
             btn.style.pointerEvents = "auto";
         }
         window.open(link, '_blank');
-        tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, লিংকটি ভিজিট করুন।");
     });
-		}
+							}
         
 
         // বাকি ফাংশনগুলো
