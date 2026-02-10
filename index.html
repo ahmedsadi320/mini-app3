@@ -243,33 +243,35 @@
 
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
-    // বাটনের আইডি খুঁজে বের করা (ad-btn-1, ad-btn-2 ইত্যাদি)
-    const btnNum = btnId.split('-')[1];
-    const btn = document.getElementById(`ad-btn-${btnNum}`);
     
-    if (!btn) return;
-
-    const originalText = btn.innerHTML; // আগের লেখা (Verify...) সেভ রাখা
-
-    // ১. ক্লিক করার সাথে সাথে বাটন 'Loading...' হয়ে যাবে
-    btn.innerText = "Loading...";
+    // সরাসরি বাটনের আইডি তৈরি করা হচ্ছে
+    const buttonId = `ad-btn-${btnId.split('-')[1]}`;
+    const btn = document.getElementById(buttonId);
+    
+    if (btn) {
+        var originalContent = btn.innerHTML; // আগের লেখা ও আইকন সেভ রাখা
+        btn.innerText = "Loading..."; // ক্লিক করলেই লোডিং দেখাবে
+        btn.style.pointerEvents = "none"; // ডাবল ক্লিক বন্ধ
+    }
 
     show_10588358({
         type: 'inApp',
         inAppSettings: { 
-            frequency: 1, // একবার ক্লিক করলে একটাই এড আসবে
+            frequency: 1, // বারবার এড আসা বন্ধ হবে
             capping: 0.1, 
             interval: 0, 
             timeout: 0, 
             everyPage: false 
         }
     }).then(() => {
-        // ২. বিজ্ঞাপন লোড হয়ে গেলে বাটন আবার আগের মতো হবে
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        // বিজ্ঞাপন শুরু হলে বাটন আবার আগের মতো হবে
+        if (btn) {
+            btn.innerHTML = originalContent;
+            btn.style.pointerEvents = "auto";
+        }
         
+        tg.showAlert("বিজ্ঞাপন শুরু হয়েছে। ১৫ সেকেন্ড অপেক্ষা করুন।");
 
-        // ১৫ সেকেন্ডের রিওয়ার্ড টাইমার
         setTimeout(() => {
             uRef.once('value').then(s => {
                 const d = s.val() || {};
@@ -293,11 +295,13 @@
         }, 15000); 
 
     }).catch(e => {
-        // ৩. বিজ্ঞাপন না আসলে বা এরর হলে বাটন আগের মতো হয়ে যাবে
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        // বিজ্ঞাপন না আসলে বাটন আগের মতো হবে এবং লিংকে পাঠাবে
+        if (btn) {
+            btn.innerHTML = originalContent;
+            btn.style.pointerEvents = "auto";
+        }
         window.open(link, '_blank');
-        tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, লিংকটি ১৫ সেকেন্ড ভিজিট করুন।");
+        tg.showAlert("বিজ্ঞাপন লোড হতে দেরি হচ্ছে, লিংকটি ভিজিট করুন।");
     });
 		}
         
