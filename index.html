@@ -279,50 +279,60 @@
     const today = new Date().toDateString();
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
+    const msgEl = document.getElementById(`msg-${btnId}`);
     
     if (btn) {
-        btn.innerText = "Loading..."; 
+        btn.innerText = "Loading Ad..."; 
         btn.style.pointerEvents = "none"; 
     }
 
     // Rewarded Popup কল করা
     show_10588358('pop').then(() => {
         if (btn) {
-            btn.innerText = "Verify";
-            btn.style.pointerEvents = "auto";
+            btn.innerText = "Watching..."; // অ্যাড শুরু হয়েছে
         }
 
-        // ১৫ সেকেন্ডের টাইমার শুরু
+        // ১৫ সেকেন্ড পর বাটনটি 'Claim Reward' হবে
         setTimeout(() => {
-            uRef.once('value').then(s => {
-                const d = s.val() || {};
-                const completedTasks = d.completedTasks || {};
+            if (btn) {
+                btn.innerText = "Claim ৳" + amount;
+                btn.className = "btn-green"; // বাটন সবুজ হয়ে যাবে
+                btn.style.pointerEvents = "auto";
+                
+                // ক্লিকের পর টাকা জমা হওয়ার লজিক
+                btn.onclick = () => {
+                    uRef.once('value').then(s => {
+                        const d = s.val() || {};
+                        const completedTasks = d.completedTasks || {};
 
-                if (completedTasks[btnId] !== today) {
-                    const currentBal = d.balance || 0;
-                    completedTasks[btnId] = today;
-                    uRef.update({
-                        balance: currentBal + amount,
-                        adsWatched: (d.adsWatched || 0) + 1,
-                        completedTasks: completedTasks
-                    }).then(() => {
-                        tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
-                        // মেসেজ আপডেট
-                        const msgEl = document.getElementById(`msg-${btnId}`);
-                        if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
+                        if (completedTasks[btnId] !== today) {
+                            const currentBal = d.balance || 0;
+                            completedTasks[btnId] = today;
+                            uRef.update({
+                                balance: currentBal + amount,
+                                adsWatched: (d.adsWatched || 0) + 1,
+                                completedTasks: completedTasks
+                            }).then(() => {
+                                tg.showAlert(`সাফল্য! ${amount} টাকা জমা হয়েছে।`);
+                                btn.innerText = "Completed ✅";
+                                btn.style.pointerEvents = "none";
+                                if(msgEl) msgEl.innerText = "Daily bonus claimed✅";
+                            });
+                        } else {
+                            tg.showAlert("আপনি আজকে এই টাস্কটি সম্পন্ন করেছেন।");
+                        }
                     });
-                }
-            });
-        }, 15000); 
+                };
+            }
+        }, 15000); // ১৫ সেকেন্ড টাইমার
 
     }).catch(e => {
-        // বিজ্ঞাপন না আসলে টেলিগ্রামের ভেতর লিংক ওপেন করা
+        // যদি বিজ্ঞাপন না আসে তবে ব্যাকআপ লিংকে পাঠানো
         if (btn) {
             btn.innerText = "Verify";
             btn.style.pointerEvents = "auto";
         }
-        // window.open এর বদলে এটি ব্যবহার করুন
-        tg.openLink(link); 
+        tg.openLink(link); // টেলিগ্রামের ভেতরেই লিংক ওপেন করার চেষ্টা
     });
 		}
         
