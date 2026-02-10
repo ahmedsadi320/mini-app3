@@ -277,54 +277,78 @@
 
         function handleTask(btnId, link, amount) {
     const today = new Date().toDateString();
-    
-    // ১. বাটনের আইডি সঠিকভাবে ধরা (Loading... নিশ্চিত করতে)
     const btnNum = btnId.split('-')[1]; 
     const btn = document.getElementById(`ad-btn-${btnNum}`);
     
     if (btn) {
-        btn.innerText = "Loading..."; // ক্লিক করার সাথে সাথে এটি আসবে
-        btn.style.pointerEvents = "none"; // অ্যাড লোড হওয়ার আগে ডাবল ক্লিক বন্ধ
+        btn.innerText = "Loading Ad 1..."; // প্রথম অ্যাড লোড হচ্ছে
+        btn.style.pointerEvents = "none"; 
     }
 
-    // ২. রিওয়ার্ডেড পপআপ কল করা (এক ক্লিকে একটি অ্যাড গ্যারান্টি)
-    show_10588358().then(() => {
-        // বিজ্ঞাপন শুরু হলে বাটন আবার 'Verify' হয়ে যাবে যাতে ইউজার আবার ক্লিক করতে পারে
-        if (btn) {
-            btn.innerText = "Verify";
-            btn.style.pointerEvents = "auto";
-        }
+    // ১. প্রথম অ্যাড কল করা ('pop' ফরম্যাট)
+    show_10588358('pop').then(() => {
+        
+        if (btn) btn.innerText = "Loading Ad 2..."; // প্রথমটি শেষ হলে দ্বিতীয়টির মেসেজ
 
-        // ৩. অ্যাড দেখা শেষ হলে ১৫ সেকেন্ড পর টাকা জমা হবে
-        setTimeout(() => {
-            uRef.once('value').then(s => {
-                const d = s.val() || {};
-                const completedTasks = d.completedTasks || {};
+        // ২. দ্বিতীয় অ্যাড কল করা (প্রথমটি শেষ হওয়ার সাথে সাথে)
+        show_10588358('pop').then(() => {
+            
+            if (btn) {
+                btn.innerText = "⏳ Watching...";
+                btn.style.background = "#58a6ff"; 
+            }
 
-                // দিনে কেবল একবারই প্রতি বক্সে টাকা যোগ হবে, কিন্তু অ্যাড আনলিমিটেড দেখা যাবে
-                if (completedTasks[btnId] !== today) {
-                    const currentBal = d.balance || 0;
-                    completedTasks[btnId] = today;
-                    uRef.update({
-                        balance: currentBal + amount,
-                        adsWatched: (d.adsWatched || 0) + 1,
-                        completedTasks: completedTasks
-                    }).then(() => {
-                        tg.showAlert(`সাফল্য! ১৫ টাকা জমা হয়েছে।`);
-                    });
+            // ৩. দুটি অ্যাড দেখা শেষ হলে ১৫ সেকেন্ডের টাইমার শুরু
+            setTimeout(() => {
+                if (btn) {
+                    btn.innerText = "🎁 Claim ৳" + amount; // টাইমার শেষে ক্লেম বাটন
+                    btn.style.background = "#28a745"; 
+                    btn.style.pointerEvents = "auto";
+                    
+                    // ৪. ক্লেম বাটনে ক্লিক করলে টাকা জমা হবে
+                    btn.onclick = () => {
+                        uRef.once('value').then(s => {
+                            const d = s.val() || {};
+                            const completedTasks = d.completedTasks || {};
+
+                            if (completedTasks[btnId] !== today) {
+                                const currentBal = d.balance || 0;
+                                completedTasks[btnId] = today;
+                                uRef.update({
+                                    balance: currentBal + amount,
+                                    adsWatched: (d.adsWatched || 0) + 1,
+                                    completedTasks: completedTasks
+                                }).then(() => {
+                                    tg.showAlert(`সাফল্য! ${amount} টাকা জমা হয়েছে।`);
+                                    btn.innerText = "Completed ✅";
+                                    btn.style.pointerEvents = "none";
+                                    btn.style.opacity = "0.6";
+                                });
+                            } else {
+                                tg.showAlert("আপনি আজকে এই টাস্কটি সম্পন্ন করেছেন।");
+                            }
+                        });
+                    };
                 }
-            });
-        }, 15000); 
+            }, 15000); // ১৫ সেকেন্ডের টাইমার
+
+        }).catch(e => {
+            resetBtn(btn, link);
+        });
 
     }).catch(e => {
-        // যদি অ্যাড না আসে তবে বাটন ঠিক করে ব্যাকআপ লিংকে পাঠানো
-        if (btn) {
-            btn.innerText = "Verify";
-            btn.style.pointerEvents = "auto";
-        }
-        window.open(link, '_blank');
+        resetBtn(btn, link);
     });
-		}
+}
+
+// ব্যাকআপ ফাংশন (অ্যাড না আসলে)
+function resetBtn(btn, link) {
+    if (btn) {
+        btn.innerText = "Verify";
+        btn.style.pointerEvents = "auto";
+    }
+    tg.openLink(link); // টেলিগ্রামের ভেতরে লিঙ্ক ওপেন
+}
         
 
         // বাকি ফাংশনগুলো
