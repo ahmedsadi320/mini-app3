@@ -8,7 +8,7 @@ CORS(app)
 
 # এখানে আপনার ডাটা বসান
 SUPABASE_URL = "https://sncrzqpvanxcylgnhete.supabase.co"
-SUPABASE_KEY = "sb_publishable_oJoB60Pmqs5nnFck1zud6A_vfOigadl" 
+SUPABASE_KEY = "sb_secret_RViT6Rc3g1A7APnLqJmocw_skrGddOh" 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/api/user', methods=['GET'])
