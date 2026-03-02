@@ -6,9 +6,10 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# আপনার Supabase তথ্য (আগের মতোই থাকবে)
+# আপনার Supabase তথ্য
 SUPABASE_URL = "https://sncrzqpvanxcylgnhete.supabase.co"
-SUPABASE_KEY = "sb_secret_RViT6Rc3g1A7APnLqJmocw_skrGddOh" # এখানে আপনার Secret Key টি দিন
+# এখানে আপনার Secret Key (sb_secret_...) দিন
+SUPABASE_KEY = "sb_secret_RViT6Rc3g1A7APnLqJmocw_skrGddOh" 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/api/user', methods=['GET'])
@@ -16,34 +17,31 @@ def get_user():
     uid = request.args.get('uid')
     ref_by = request.args.get('ref')
     
-    # প্রথমে চেক করি ইউজার আগে থেকে আছে কি না
+    if not uid:
+        return jsonify({"error": "No UID"}), 400
+
+    # ১. প্রথমে ডাটাবেসে চেক করি ইউজার আছে কি না
     res = supabase.table("users").select("*").eq("uid", uid).execute()
     
+    # ২. ইউজার যদি একদম নতুন হয় (ডাটাবেসে নেই)
     if not res.data:
-        # ইউজার যদি একদম নতুন হয়, তবেই রেফারেল বোনাস দাও
-        if ref_by and ref_by != uid:
+        # ৩. যদি তাকে কেউ রেফার করে থাকে এবং সে নিজে নিজেকে রেফার না করে
+        if ref_by and ref_by != "undefined" and ref_by != uid:
+            # রেফারেল বোনাস ফাংশন রান করো
             supabase.rpc('increment_referral', {'row_id': ref_by}).execute()
         
-        # এবার নতুন ইউজারকে ডাটাবেসে সেভ করো
-        supabase.table("users").insert({"uid": uid, "balance": 0}).execute()
-        return jsonify({"balance": 0, "referrals": 0, "ads_watched": 0, "completed_today": []})
+        # ৪. এবার নতুন ইউজারকে ডাটাবেসে সেভ করো
+        new_user = {"uid": uid, "balance": 0, "referrals": 0, "ads_watched": 0}
+        supabase.table("users").insert(new_user).execute()
+        return jsonify(new_user)
     
-    # পুরাতন ইউজার হলে তার তথ্য দাও
+    # ৫. পুরাতন ইউজার হলে তার তথ্য ফেরত দাও
     u = res.data[0]
-    tasks = supabase.table("tasks").select("task_id").eq("uid", uid).execute()
     return jsonify({
-        "balance": u['balance'], 
-        "referrals": u['referrals'], 
-        "ads_watched": u['ads_watched'], 
-        "completed_today": [x['task_id'] for x in tasks.data]
+        "balance": u.get('balance', 0),
+        "referrals": u.get('referrals', 0),
+        "ads_watched": u.get('ads_watched', 0)
     })
-
-@app.route('/api/add_money', methods=['POST'])
-def add_money():
-    data = request.json
-    supabase.rpc('add_balance', {'row_id': data['uid'], 'amount': data['amount']}).execute()
-    supabase.table("tasks").insert({"uid": data['uid'], "task_id": data['task']}).execute()
-    return jsonify({"status": "success"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
